@@ -1,7 +1,5 @@
-# rag/loader.py
-
 from llama_index.core import SimpleDirectoryReader           
-from langchain_core.documents import Document                # LangChain's standard document wrapper (page_content + metadata)
+from langchain_core.documents import Document                # LangChain's document wrapper (page_content + metadata)
 
 
 def load_documents(folder_path: str) -> list[Document]:

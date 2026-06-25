@@ -1,9 +1,8 @@
-# rag/retrieval.py
-
 from langchain_community.retrievers import BM25Retriever   
 from langchain_core.documents import Document               # LangChain's Document wrapper (page_content + metadata)
 from langchain_qdrant import QdrantVectorStore              
 from sentence_transformers import CrossEncoder              
+from rag.logger import logger                               # Import shared logger
 
 
 # ── Configuration constants ──────────────────────────────────────────────────
@@ -60,17 +59,21 @@ def get_dense_retriever(vectorstore: QdrantVectorStore, k: int = TOP_K_RETRIEVE)
 
 def _merge_results(bm25_docs: list[Document], dense_docs: list[Document]) -> list[Document]:
 
-    seen: set[str] = set()                             # Set of already-seen content fingerprints
-    merged: list[Document] = []                        # Output list of unique documents
+    # Calculate how many docs to take from each source based on the desired ratio
+    # BM25 gets 20% of the total pool, dense gets 80%
+    total = len(bm25_docs) + len(dense_docs)          # Total number of retrieved docs across both sources
 
-    for doc in bm25_docs + dense_docs:                 # Iterate over BM25 results first, then dense results
-        fingerprint = doc.page_content.strip()[:200]   # Use the first 200 chars as a deduplication key (fast + effective)
+    bm25_limit = round(total * 0.20)                  # 20% allocated to BM25 results
+    dense_limit = round(total * 0.80)                 # 80% allocated to dense (vector) results
 
-        if fingerprint not in seen:                    # Only add documents that haven't seen yet
-            seen.add(fingerprint)                      # Mark this fingerprint as seen
-            merged.append(doc)                         # Add unique document to merged list
+    # Slice each list to respect the ratio limits (preserve original ranking order within each source)
+    bm25_slice  = bm25_docs[:bm25_limit]              # Take only the top 20% from BM25
+    dense_slice = dense_docs[:dense_limit]            # Take only the top 80% from dense
 
-    return merged                                      # Return the deduplicated list
+    # Concatenate dense first so semantic results lead, followed by BM25 keyword results
+    merged: list[Document] = dense_slice + bm25_slice # Dense first to prioritize semantic results
+
+    return merged                                     # Return the weighted merged list
 
 
 # ── Stage 3: Cross-encoder re-ranking ────────────────────────────────────────
@@ -92,24 +95,11 @@ def rerank_documents(
     scores: list[float] = cross_encoder.predict(pairs).tolist()  # Score every (query, doc) pair in one batch call
 
     # Zip documents with their scores and sort best-first
-    ranked = sorted(                                   # Sort the combined list ...
+    ranked = sorted(                                   # Sort the combined list
         zip(docs, scores),                             # ... of (Document, score) tuples ...
         key=lambda pair: pair[1],                      # ... by the score (second element of each tuple) ...
         reverse=True                                   # ... in descending order (highest score = most relevant)
     )
-
-    # ── Print all scores for inspection ──────────────────────────────────────
-    print(f"\n[Retrieval] ══════════ Reranking Scores ({len(ranked)} candidates) ══════════")
-    for rank, (doc, score) in enumerate(ranked, start=1):              # Enumerate from 1 for human-friendly rank numbers
-        source  = doc.metadata.get(                                    # Try to get a human-readable file name from metadata
-            "file_name",                                               # LlamaIndex often stores this as 'file_name'
-            doc.metadata.get("source", "unknown")                      # Fall back to 'source' or 'unknown'
-        )
-        snippet = doc.page_content[:90].replace("\n", " ")             # First 90 chars, newlines replaced with space
-        marker  = " ◀ SELECTED" if rank <= top_n else ""              # Mark the chunks that will actually be used
-        print(f"  Rank {rank:>2} | Score {score:+.4f} | {source}{marker}")  # Score (+ prefix shows sign clearly)
-        print(f"         Snippet: {snippet}...")                       # Show a preview of the chunk content
-    print(f"[Retrieval] ════════════════════════════════════════════════════════\n")
 
     top_docs = list(ranked)[:top_n]                    # Keep only the top-n documents after sorting
 
@@ -123,24 +113,45 @@ def rerank_documents(
 def retrieve(
     query: str,
     bm25_retriever: BM25Retriever,
-    dense_retriever,
-    top_n: int = TOP_N_RERANK
+    dense_retriever
 ) -> list[tuple[Document, float]]:
+    
+    logger.info(  # Record incoming user query
+        f"Query received: {query}"
+    )
 
     print(f"[Retrieval] Query: '{query}'")                              # Echo the query for debugging
 
     # ── Stage 1 & 2: Run both retrievers ─────────────────────────────────────
     bm25_docs  = bm25_retriever.invoke(query)                           # BM25 keyword search
+
+    logger.info(                                                        # Record BM25 retrieval count
+        f"BM25 returned {len(bm25_docs)} documents"
+    )
+
     dense_docs = dense_retriever.invoke(query)                          # Dense vector search
+
+    logger.info(                                                        # Record dense retrieval count
+        f"Dense returned {len(dense_docs)} documents"
+    )
 
     print(f"[Retrieval] BM25 returned  {len(bm25_docs)} doc(s)")        # Log BM25 hit count
     print(f"[Retrieval] Dense returned {len(dense_docs)} doc(s)")       # Log dense hit count
 
     # ── Stage 3: Merge and deduplicate ───────────────────────────────────────
     merged = _merge_results(bm25_docs, dense_docs)                      # Combine and deduplicate results
+
+    logger.info(                                                        # Record merged retrieval count
+        f"Merged into {len(merged)} unique documents"
+    )
+
     print(f"[Retrieval] After merge: {len(merged)} unique doc(s)")      # Log merged count
 
     # ── Stage 4: Cross-encoder re-ranking ────────────────────────────────────
-    ranked = rerank_documents(query, merged, top_n=top_n)               # Score and sort all candidates
+    ranked = rerank_documents(query, merged, TOP_N_RERANK)               # Score and sort all candidates
+
+    logger.info(                                                        # Record reranking results
+        f"Returned {len(ranked)} reranked document(s)"                  # Final reranked document count
+    )
 
     return ranked                                                        # Return final (Document, score) pairs

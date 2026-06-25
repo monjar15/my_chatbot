@@ -1,0 +1,368 @@
+2026-06-25 15:21:51,423 | INFO | Chatbot application started
+2026-06-25 15:21:57,882 | INFO | Loading existing index
+2026-06-25 15:22:12,885 | INFO | Loaded existing index (2002 chunks)
+2026-06-25 15:22:30,259 | INFO | User query: who is jose rizal?
+2026-06-25 15:22:30,418 | INFO | Query received: who is jose rizal?
+2026-06-25 15:22:30,454 | INFO | BM25 returned 10 documents
+2026-06-25 15:22:31,124 | INFO | Dense returned 10 documents
+2026-06-25 15:22:31,125 | INFO | Merged into 14 unique documents
+2026-06-25 15:22:55,616 | INFO | Returned 4 reranked document(s)
+2026-06-25 15:22:55,619 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-25 15:22:57,305 | INFO | Chunk 1 | Score=+0.9995 | Source=José Rizal - Wikipedia.md
+2026-06-25 15:22:57,305 | INFO | Chunk 2 | Score=+0.9738 | Source=José Rizal - Wikipedia.md
+2026-06-25 15:22:57,306 | INFO | Chunk 3 | Score=+0.9553 | Source=José Rizal - Wikipedia.md
+2026-06-25 15:22:57,306 | INFO | Chunk 4 | Score=+0.9201 | Source=José Rizal - Wikipedia.md
+2026-06-25 15:22:57,306 | INFO | Streaming RAG chain for: 'who is jose rizal?'
+2026-06-25 15:23:57,137 | INFO | Stream complete (412 token(s))
+2026-06-25 15:23:57,161 | INFO | Generated response (762 chars)
+2026-06-25 15:23:57,161 | INFO | ================================================================================
+2026-06-25 16:17:37,607 | INFO | Chatbot application started
+2026-06-25 16:17:44,502 | INFO | Loading existing index
+2026-06-25 16:17:59,240 | INFO | Loaded existing index (2002 chunks)
+2026-06-25 16:18:12,607 | INFO | User query: who is jose rizal?
+2026-06-25 16:18:12,800 | INFO | Query received: who is jose rizal?
+2026-06-25 16:18:12,852 | INFO | BM25 returned 10 documents
+2026-06-25 16:18:13,611 | INFO | Dense returned 10 documents
+2026-06-25 16:18:13,612 | INFO | Merged into 14 unique documents
+2026-06-25 16:18:37,643 | INFO | Returned 4 reranked document(s)
+2026-06-25 16:18:37,645 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-25 16:18:38,946 | INFO | Chunk 1 | Score=+0.9995 | Source=José Rizal - Wikipedia.md
+2026-06-25 16:18:38,947 | INFO | Chunk 2 | Score=+0.9738 | Source=José Rizal - Wikipedia.md
+2026-06-25 16:18:38,947 | INFO | Chunk 3 | Score=+0.9553 | Source=José Rizal - Wikipedia.md
+2026-06-25 16:18:38,947 | INFO | Chunk 4 | Score=+0.9201 | Source=José Rizal - Wikipedia.md
+2026-06-25 16:18:38,948 | INFO | Streaming RAG chain for: 'who is jose rizal?'
+2026-06-25 16:19:56,470 | INFO | Stream complete (517 token(s))
+2026-06-25 16:19:56,527 | INFO | Generated response (1117 chars)
+2026-06-25 16:19:56,538 | INFO | ================================================================================
+2026-06-25 16:20:15,516 | INFO | User query: how about andrei bonifacio?
+2026-06-25 16:20:15,792 | INFO | Query received: how about andrei bonifacio?
+2026-06-25 16:20:15,815 | INFO | BM25 returned 10 documents
+2026-06-25 16:20:18,926 | INFO | Dense returned 10 documents
+2026-06-25 16:20:18,927 | INFO | Merged into 14 unique documents
+2026-06-25 16:20:37,167 | INFO | Returned 4 reranked document(s)
+2026-06-25 16:20:37,171 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-25 16:20:38,654 | INFO | Chunk 1 | Score=+0.9819 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 16:20:38,654 | INFO | Chunk 2 | Score=+0.7409 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 16:20:38,654 | INFO | Chunk 3 | Score=+0.6586 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 16:20:38,654 | INFO | Chunk 4 | Score=+0.5264 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 16:20:38,664 | INFO | Streaming RAG chain for: 'how about andrei bonifacio?'
+2026-06-25 16:22:04,096 | INFO | Stream complete (543 token(s))
+2026-06-25 16:22:04,106 | INFO | Generated response (171 chars)
+2026-06-25 16:22:04,112 | INFO | STEP 4 triggered — awaiting_clarification set to True
+2026-06-25 16:22:04,112 | INFO | ================================================================================
+2026-06-25 16:22:43,035 | INFO | User query: oh,, you are right,, i mistype na name,, it is andres nonifacio
+2026-06-25 16:22:43,041 | INFO | Clarification reply received: oh,, you are right,, i mistype na name,, it is andres nonifacio
+2026-06-25 16:22:44,334 | INFO | Streaming clarification chain for reply: 'oh,, you are right,, i mistype na name,, it is andres nonifacio'
+2026-06-25 16:23:03,108 | INFO | Clarification stream complete (175 token(s))
+2026-06-25 16:23:03,111 | INFO | Clarification turn complete — awaiting_clarification reset to False
+2026-06-25 16:23:03,111 | INFO | ================================================================================
+2026-06-25 16:23:32,339 | INFO | User query: sorry, i mistakenly mistype again, the correct word is andres bonifacio
+2026-06-25 16:23:32,493 | INFO | Query received: sorry, i mistakenly mistype again, the correct word is andres bonifacio
+2026-06-25 16:23:32,534 | INFO | BM25 returned 10 documents
+2026-06-25 16:23:35,656 | INFO | Dense returned 10 documents
+2026-06-25 16:23:35,658 | INFO | Merged into 14 unique documents
+2026-06-25 16:23:55,845 | INFO | Returned 4 reranked document(s)
+2026-06-25 16:23:55,850 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-25 16:23:57,411 | INFO | Chunk 1 | Score=+0.8825 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 16:23:57,412 | INFO | Chunk 2 | Score=+0.7724 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 16:23:57,412 | INFO | Chunk 3 | Score=+0.4332 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 16:23:57,412 | INFO | Chunk 4 | Score=+0.2641 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 16:23:57,424 | INFO | Streaming RAG chain for: 'sorry, i mistakenly mistype again, the correct word is andres bonifacio'
+2026-06-25 16:25:05,401 | INFO | Stream complete (456 token(s))
+2026-06-25 16:25:05,408 | INFO | Generated response (919 chars)
+2026-06-25 16:25:05,414 | INFO | ================================================================================
+2026-06-25 16:40:40,455 | INFO | Chatbot application started
+2026-06-25 16:41:04,877 | INFO | Loading existing index
+2026-06-25 16:42:01,145 | INFO | Chatbot application started
+2026-06-25 16:42:08,696 | INFO | Loading existing index
+2026-06-25 16:42:22,968 | INFO | Loaded existing index (2002 chunks)
+2026-06-25 16:42:35,650 | INFO | User query: jose rizal
+2026-06-25 16:42:35,790 | INFO | Query received: jose rizal
+2026-06-25 16:42:35,817 | INFO | BM25 returned 10 documents
+2026-06-25 16:42:36,168 | INFO | Dense returned 10 documents
+2026-06-25 16:42:36,169 | INFO | Merged into 14 unique documents
+2026-06-25 16:43:00,919 | INFO | Returned 4 reranked document(s)
+2026-06-25 16:43:00,920 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-25 16:43:02,210 | INFO | Chunk 1 | Score=+0.9973 | Source=José Rizal - Wikipedia.md
+2026-06-25 16:43:02,210 | INFO | Chunk 2 | Score=+0.9646 | Source=José Rizal - Wikipedia.md
+2026-06-25 16:43:02,210 | INFO | Chunk 3 | Score=+0.9483 | Source=José Rizal - Wikipedia.md
+2026-06-25 16:43:02,210 | INFO | Chunk 4 | Score=+0.9411 | Source=José Rizal - Wikipedia.md
+2026-06-25 16:43:02,210 | INFO | Streaming RAG chain for: 'jose rizal'
+2026-06-25 16:44:06,545 | INFO | Stream complete (430 token(s))
+2026-06-25 16:44:06,605 | INFO | Generated response (1008 chars)
+2026-06-25 16:44:06,626 | INFO | ================================================================================
+2026-06-25 16:44:52,698 | INFO | User query: andrei bonifacio
+2026-06-25 16:44:52,973 | INFO | Query received: andrei bonifacio
+2026-06-25 16:44:52,989 | INFO | BM25 returned 10 documents
+2026-06-25 16:44:55,638 | INFO | Dense returned 10 documents
+2026-06-25 16:44:55,643 | INFO | Merged into 14 unique documents
+2026-06-25 16:45:13,125 | INFO | Returned 4 reranked document(s)
+2026-06-25 16:45:13,128 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-25 16:45:14,679 | INFO | Chunk 1 | Score=+0.9942 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 16:45:14,681 | INFO | Chunk 2 | Score=+0.8817 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 16:45:14,681 | INFO | Chunk 3 | Score=+0.7351 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 16:45:14,681 | INFO | Chunk 4 | Score=+0.7215 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 16:45:14,689 | INFO | Streaming RAG chain for: 'andrei bonifacio'
+2026-06-25 16:46:19,001 | INFO | Stream complete (435 token(s))
+2026-06-25 16:46:19,009 | INFO | Generated response (708 chars)
+2026-06-25 16:46:19,018 | INFO | ================================================================================
+2026-06-25 16:47:36,983 | INFO | User query: jope pital
+2026-06-25 16:47:37,204 | INFO | Query received: jope pital
+2026-06-25 16:47:37,216 | INFO | BM25 returned 10 documents
+2026-06-25 16:47:40,022 | INFO | Dense returned 10 documents
+2026-06-25 16:47:40,022 | INFO | Merged into 14 unique documents
+2026-06-25 16:47:58,822 | INFO | Returned 4 reranked document(s)
+2026-06-25 16:47:58,825 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-25 16:48:00,425 | INFO | Chunk 1 | Score=+0.0023 | Source=José Rizal - Wikipedia.md
+2026-06-25 16:48:00,425 | INFO | Chunk 2 | Score=+0.0019 | Source=José Rizal - Wikipedia.md
+2026-06-25 16:48:00,425 | INFO | Chunk 3 | Score=+0.0018 | Source=José Rizal - Wikipedia.md
+2026-06-25 16:48:00,425 | INFO | Chunk 4 | Score=+0.0016 | Source=José Rizal - Wikipedia.md
+2026-06-25 16:48:00,428 | INFO | Streaming RAG chain for: 'jope pital'
+2026-06-25 16:49:00,519 | INFO | Stream complete (306 token(s))
+2026-06-25 16:49:00,528 | INFO | Generated response (165 chars)
+2026-06-25 16:49:00,538 | INFO | STEP 4 triggered — awaiting_clarification set to True
+2026-06-25 16:49:00,538 | INFO | ================================================================================
+2026-06-25 16:55:06,278 | INFO | Chatbot application started
+2026-06-25 16:55:43,413 | INFO | Loading existing index
+2026-06-25 16:55:58,162 | INFO | Loaded existing index (2002 chunks)
+2026-06-25 16:56:12,512 | INFO | User query: batman
+2026-06-25 16:56:12,692 | INFO | Query received: batman
+2026-06-25 16:56:12,736 | INFO | BM25 returned 10 documents
+2026-06-25 16:56:13,481 | INFO | Dense returned 10 documents
+2026-06-25 16:56:13,481 | INFO | Merged into 14 unique documents
+2026-06-25 16:56:37,191 | INFO | Returned 4 reranked document(s)
+2026-06-25 16:56:37,192 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-25 16:56:38,422 | INFO | Chunk 1 | Score=+0.1802 | Source=Katipunan - Wikipedia.md
+2026-06-25 16:56:38,422 | INFO | Chunk 2 | Score=+0.0851 | Source=Spanish–American War - Wikipedia.md
+2026-06-25 16:56:38,422 | INFO | Chunk 3 | Score=+0.0689 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-25 16:56:38,423 | INFO | Chunk 4 | Score=+0.0013 | Source=Spanish–American War - Wikipedia.md
+2026-06-25 16:56:38,423 | INFO | Streaming RAG chain for: 'batman'
+2026-06-25 16:57:09,379 | INFO | Stream complete (215 token(s))
+2026-06-25 16:57:09,384 | INFO | Generated response (161 chars)
+2026-06-25 16:57:09,384 | INFO | STEP 4 triggered — awaiting_clarification set to True
+2026-06-25 16:57:09,385 | INFO | ================================================================================
+2026-06-25 16:57:20,081 | INFO | User query: jose rizal
+2026-06-25 16:57:20,089 | INFO | Clarification reply received: jose rizal
+2026-06-25 16:57:21,496 | INFO | Streaming clarification chain for reply: 'jose rizal'
+2026-06-25 16:57:42,137 | INFO | Clarification stream complete (245 token(s))
+2026-06-25 16:57:42,140 | INFO | Clarification turn complete — awaiting_clarification reset to False
+2026-06-25 16:57:42,140 | INFO | ================================================================================
+2026-06-25 16:58:55,570 | INFO | User query: jose rizal
+2026-06-25 16:58:55,754 | INFO | Query received: jose rizal
+2026-06-25 16:58:55,768 | INFO | BM25 returned 10 documents
+2026-06-25 16:58:58,270 | INFO | Dense returned 10 documents
+2026-06-25 16:58:58,272 | INFO | Merged into 14 unique documents
+2026-06-25 16:59:15,620 | INFO | Returned 4 reranked document(s)
+2026-06-25 16:59:15,621 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-25 16:59:16,994 | INFO | Chunk 1 | Score=+0.9973 | Source=José Rizal - Wikipedia.md
+2026-06-25 16:59:16,994 | INFO | Chunk 2 | Score=+0.9646 | Source=José Rizal - Wikipedia.md
+2026-06-25 16:59:16,994 | INFO | Chunk 3 | Score=+0.9483 | Source=José Rizal - Wikipedia.md
+2026-06-25 16:59:16,994 | INFO | Chunk 4 | Score=+0.9411 | Source=José Rizal - Wikipedia.md
+2026-06-25 16:59:17,001 | INFO | Streaming RAG chain for: 'jose rizal'
+2026-06-25 17:00:22,186 | INFO | Stream complete (501 token(s))
+2026-06-25 17:00:22,192 | INFO | Generated response (862 chars)
+2026-06-25 17:00:22,199 | INFO | ================================================================================
+2026-06-25 18:01:31,526 | INFO | Chatbot application started
+2026-06-25 18:01:40,332 | INFO | Loading existing index
+2026-06-25 18:01:54,515 | INFO | Loaded existing index (2002 chunks)
+2026-06-25 18:02:28,250 | INFO | User query: jose pital
+2026-06-25 18:02:28,413 | INFO | Query received: jose pital
+2026-06-25 18:02:28,448 | INFO | BM25 returned 10 documents
+2026-06-25 18:02:29,123 | INFO | Dense returned 10 documents
+2026-06-25 18:02:29,124 | INFO | Merged into 14 unique documents
+2026-06-25 18:02:56,121 | INFO | Returned 4 reranked document(s)
+2026-06-25 18:02:56,123 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-25 18:02:57,507 | INFO | Chunk 1 | Score=+0.0372 | Source=José Rizal - Wikipedia.md
+2026-06-25 18:02:57,508 | INFO | Chunk 2 | Score=+0.0106 | Source=José Rizal - Wikipedia.md
+2026-06-25 18:02:57,509 | INFO | Chunk 3 | Score=+0.0099 | Source=José Rizal - Wikipedia.md
+2026-06-25 18:02:57,509 | INFO | Chunk 4 | Score=+0.0082 | Source=José Rizal - Wikipedia.md
+2026-06-25 18:02:57,510 | INFO | Streaming RAG chain for: 'jose pital'
+2026-06-25 18:04:17,837 | INFO | Stream complete (471 token(s))
+2026-06-25 18:04:17,847 | INFO | Generated response (165 chars)
+2026-06-25 18:04:17,855 | INFO | STEP 4 triggered — awaiting_clarification set to True
+2026-06-25 18:04:17,856 | INFO | ================================================================================
+2026-06-25 18:04:41,009 | INFO | User query: andres bonifacio
+2026-06-25 18:04:41,012 | INFO | Clarification reply received: andres bonifacio
+2026-06-25 18:04:42,217 | INFO | Streaming clarification chain for reply: 'andres bonifacio'
+2026-06-25 18:04:58,510 | INFO | Clarification stream complete (185 token(s))
+2026-06-25 18:04:58,515 | INFO | Clarification turn complete — awaiting_clarification reset to False
+2026-06-25 18:04:58,515 | INFO | ================================================================================
+2026-06-25 18:05:07,819 | INFO | User query: andres bonifacio
+2026-06-25 18:05:08,011 | INFO | Query received: andres bonifacio
+2026-06-25 18:05:08,022 | INFO | BM25 returned 10 documents
+2026-06-25 18:05:11,399 | INFO | Dense returned 10 documents
+2026-06-25 18:05:11,403 | INFO | Merged into 14 unique documents
+2026-06-25 18:05:29,057 | INFO | Returned 4 reranked document(s)
+2026-06-25 18:05:29,060 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-25 18:05:30,661 | INFO | Chunk 1 | Score=+0.9359 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 18:05:30,661 | INFO | Chunk 2 | Score=+0.8482 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 18:05:30,661 | INFO | Chunk 3 | Score=+0.8240 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 18:05:30,661 | INFO | Chunk 4 | Score=+0.8240 | Source=Philippine Revolution - Wikipedia.md
+2026-06-25 18:05:30,668 | INFO | Streaming RAG chain for: 'andres bonifacio'
+2026-06-25 18:06:13,185 | INFO | Stream complete (303 token(s))
+2026-06-25 18:06:13,193 | INFO | Generated response (371 chars)
+2026-06-25 18:06:13,205 | INFO | ================================================================================
+2026-06-25 18:07:34,627 | INFO | User query: jose rizal
+2026-06-25 18:07:34,875 | INFO | Query received: jose rizal
+2026-06-25 18:07:34,889 | INFO | BM25 returned 10 documents
+2026-06-25 18:07:37,519 | INFO | Dense returned 10 documents
+2026-06-25 18:07:37,520 | INFO | Merged into 14 unique documents
+2026-06-25 18:07:55,394 | INFO | Returned 4 reranked document(s)
+2026-06-25 18:07:55,396 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-25 18:07:57,054 | INFO | Chunk 1 | Score=+0.9973 | Source=José Rizal - Wikipedia.md
+2026-06-25 18:07:57,055 | INFO | Chunk 2 | Score=+0.9646 | Source=José Rizal - Wikipedia.md
+2026-06-25 18:07:57,055 | INFO | Chunk 3 | Score=+0.9483 | Source=José Rizal - Wikipedia.md
+2026-06-25 18:07:57,055 | INFO | Chunk 4 | Score=+0.9411 | Source=José Rizal - Wikipedia.md
+2026-06-25 18:07:57,084 | INFO | Streaming RAG chain for: 'jose rizal'
+2026-06-25 18:08:58,837 | INFO | Stream complete (430 token(s))
+2026-06-25 18:08:58,843 | INFO | Generated response (1008 chars)
+2026-06-25 18:08:58,856 | INFO | ================================================================================
+2026-06-25 18:09:10,914 | INFO | User query: andrei bonifacto
+2026-06-25 18:09:11,158 | INFO | Query received: andrei bonifacto
+2026-06-25 18:09:11,173 | INFO | BM25 returned 10 documents
+2026-06-25 18:09:13,483 | INFO | Dense returned 10 documents
+2026-06-25 18:09:13,484 | INFO | Merged into 14 unique documents
+2026-06-25 18:09:30,004 | INFO | Returned 4 reranked document(s)
+2026-06-25 18:09:30,007 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-25 18:09:31,489 | INFO | Chunk 1 | Score=+0.7638 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 18:09:31,489 | INFO | Chunk 2 | Score=+0.5926 | Source=Philippine Revolution - Wikipedia.md
+2026-06-25 18:09:31,489 | INFO | Chunk 3 | Score=+0.5926 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 18:09:31,489 | INFO | Chunk 4 | Score=+0.5137 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 18:09:31,501 | INFO | Streaming RAG chain for: 'andrei bonifacto'
+2026-06-25 18:10:32,203 | INFO | Stream complete (457 token(s))
+2026-06-25 18:10:32,213 | INFO | Generated response (663 chars)
+2026-06-25 18:10:32,224 | INFO | ================================================================================
+2026-06-25 18:11:34,127 | INFO | User query: batman
+2026-06-25 18:11:34,309 | INFO | Query received: batman
+2026-06-25 18:11:34,322 | INFO | BM25 returned 10 documents
+2026-06-25 18:11:36,840 | INFO | Dense returned 10 documents
+2026-06-25 18:11:36,841 | INFO | Merged into 14 unique documents
+2026-06-25 18:11:57,030 | INFO | Returned 4 reranked document(s)
+2026-06-25 18:11:57,031 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-25 18:11:58,951 | INFO | Chunk 1 | Score=+0.1802 | Source=Katipunan - Wikipedia.md
+2026-06-25 18:11:58,952 | INFO | Chunk 2 | Score=+0.0851 | Source=Spanish–American War - Wikipedia.md
+2026-06-25 18:11:58,952 | INFO | Chunk 3 | Score=+0.0689 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-25 18:11:58,952 | INFO | Chunk 4 | Score=+0.0013 | Source=Spanish–American War - Wikipedia.md
+2026-06-25 18:11:58,954 | INFO | Streaming RAG chain for: 'batman'
+2026-06-25 18:12:30,858 | INFO | Stream complete (229 token(s))
+2026-06-25 18:12:30,866 | INFO | Generated response (161 chars)
+2026-06-25 18:12:30,872 | INFO | STEP 4 triggered — awaiting_clarification set to True
+2026-06-25 18:12:30,872 | INFO | ================================================================================
+2026-06-25 18:15:08,336 | INFO | User query: yes
+2026-06-25 18:15:08,344 | INFO | Clarification reply received: yes
+2026-06-25 18:15:09,563 | INFO | Streaming clarification chain for reply: 'yes'
+2026-06-25 18:15:29,314 | INFO | Clarification stream complete (202 token(s))
+2026-06-25 18:15:29,316 | INFO | Clarification turn complete — awaiting_clarification reset to False
+2026-06-25 18:15:29,317 | INFO | ================================================================================
+2026-06-25 18:16:01,572 | INFO | User query: i mean no
+2026-06-25 18:16:01,755 | INFO | Query received: i mean no
+2026-06-25 18:16:01,775 | INFO | BM25 returned 10 documents
+2026-06-25 18:16:04,335 | INFO | Dense returned 10 documents
+2026-06-25 18:16:04,338 | INFO | Merged into 14 unique documents
+2026-06-25 18:16:17,926 | INFO | Returned 4 reranked document(s)
+2026-06-25 18:16:17,930 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-25 18:16:19,530 | INFO | Chunk 1 | Score=+0.1019 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-25 18:16:19,530 | INFO | Chunk 2 | Score=+0.0554 | Source=Katipunan - Wikipedia.md
+2026-06-25 18:16:19,531 | INFO | Chunk 3 | Score=+0.0226 | Source=José Rizal - Wikipedia.md
+2026-06-25 18:16:19,531 | INFO | Chunk 4 | Score=+0.0030 | Source=Independence Day (Philippines) - Wikipedia.md
+2026-06-25 18:16:19,538 | INFO | Streaming RAG chain for: 'i mean no'
+2026-06-25 18:16:48,109 | INFO | Stream complete (235 token(s))
+2026-06-25 18:16:48,114 | INFO | Generated response (164 chars)
+2026-06-25 18:16:48,115 | INFO | STEP 4 triggered — awaiting_clarification set to True
+2026-06-25 18:16:48,115 | INFO | ================================================================================
+2026-06-25 18:17:12,367 | INFO | User query: no
+2026-06-25 18:17:12,371 | INFO | Clarification reply received: no
+2026-06-25 18:17:13,555 | INFO | Streaming clarification chain for reply: 'no'
+2026-06-25 18:17:26,917 | INFO | Clarification stream complete (139 token(s))
+2026-06-25 18:17:26,920 | INFO | Clarification turn complete — awaiting_clarification reset to False
+2026-06-25 18:17:26,920 | INFO | ================================================================================
+2026-06-25 19:00:56,079 | INFO | Chatbot application started
+2026-06-25 19:01:03,290 | INFO | Loading existing index
+2026-06-25 19:01:20,567 | INFO | Loaded existing index (2002 chunks)
+2026-06-25 19:01:45,491 | INFO | User query: batman
+2026-06-25 19:01:45,696 | INFO | Query received: batman
+2026-06-25 19:01:45,742 | INFO | BM25 returned 10 documents
+2026-06-25 19:01:46,899 | INFO | Dense returned 10 documents
+2026-06-25 19:01:46,899 | INFO | Merged into 14 unique documents
+2026-06-25 19:02:12,500 | INFO | Returned 4 reranked document(s)
+2026-06-25 19:02:12,501 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-25 19:02:13,888 | INFO | Chunk 1 | Score=+0.1802 | Source=Katipunan - Wikipedia.md
+2026-06-25 19:02:13,888 | INFO | Chunk 2 | Score=+0.0851 | Source=Spanish–American War - Wikipedia.md
+2026-06-25 19:02:13,888 | INFO | Chunk 3 | Score=+0.0689 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-25 19:02:13,888 | INFO | Chunk 4 | Score=+0.0013 | Source=Spanish–American War - Wikipedia.md
+2026-06-25 19:02:13,889 | INFO | Streaming RAG chain for: 'batman'
+2026-06-25 19:02:49,091 | INFO | Stream complete (224 token(s))
+2026-06-25 19:02:49,106 | INFO | Generated response (175 chars)
+2026-06-25 19:02:49,111 | INFO | STEP 4 triggered — awaiting_clarification set to True
+2026-06-25 19:02:49,112 | INFO | ================================================================================
+2026-06-25 19:03:06,585 | INFO | User query: Yes
+2026-06-25 19:03:06,590 | INFO | Clarification reply received: Yes
+2026-06-25 19:03:06,656 | INFO | Clarification turn complete — awaiting_clarification=False
+2026-06-25 19:03:06,658 | INFO | ================================================================================
+2026-06-25 19:03:25,423 | INFO | User query: Ramon
+2026-06-25 19:03:25,620 | INFO | Query received: Ramon
+2026-06-25 19:03:25,644 | INFO | BM25 returned 10 documents
+2026-06-25 19:03:28,626 | INFO | Dense returned 10 documents
+2026-06-25 19:03:28,627 | INFO | Merged into 14 unique documents
+2026-06-25 19:03:49,269 | INFO | Returned 4 reranked document(s)
+2026-06-25 19:03:49,279 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-25 19:03:51,428 | INFO | Chunk 1 | Score=+0.0540 | Source=Spanish–American War - Wikipedia.md
+2026-06-25 19:03:51,428 | INFO | Chunk 2 | Score=+0.0402 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 19:03:51,430 | INFO | Chunk 3 | Score=+0.0402 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 19:03:51,430 | INFO | Chunk 4 | Score=+0.0098 | Source=Katipunan - Wikipedia.md
+2026-06-25 19:03:51,447 | INFO | Streaming RAG chain for: 'Ramon'
+2026-06-25 19:04:43,851 | INFO | Stream complete (349 token(s))
+2026-06-25 19:04:43,857 | INFO | Generated response (493 chars)
+2026-06-25 19:04:43,867 | INFO | ================================================================================
+2026-06-25 19:05:37,180 | INFO | User query: olaf
+2026-06-25 19:05:37,518 | INFO | Query received: olaf
+2026-06-25 19:05:37,534 | INFO | BM25 returned 10 documents
+2026-06-25 19:05:40,639 | INFO | Dense returned 10 documents
+2026-06-25 19:05:40,640 | INFO | Merged into 14 unique documents
+2026-06-25 19:05:58,616 | INFO | Returned 4 reranked document(s)
+2026-06-25 19:05:58,618 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-25 19:06:00,431 | INFO | Chunk 1 | Score=+0.0265 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-25 19:06:00,431 | INFO | Chunk 2 | Score=+0.0219 | Source=Katipunan - Wikipedia.md
+2026-06-25 19:06:00,431 | INFO | Chunk 3 | Score=+0.0037 | Source=Independence Day (Philippines) - Wikipedia.md
+2026-06-25 19:06:00,432 | INFO | Chunk 4 | Score=+0.0007 | Source=Spanish–American War - Wikipedia.md
+2026-06-25 19:06:00,444 | INFO | Streaming RAG chain for: 'olaf'
+2026-06-25 19:06:32,492 | INFO | Stream complete (224 token(s))
+2026-06-25 19:06:32,501 | INFO | Generated response (173 chars)
+2026-06-25 19:06:32,504 | INFO | STEP 4 triggered — awaiting_clarification set to True
+2026-06-25 19:06:32,504 | INFO | ================================================================================
+2026-06-25 19:06:48,480 | INFO | User query: no
+2026-06-25 19:06:48,485 | INFO | Clarification reply received: no
+2026-06-25 19:06:48,502 | INFO | Clarification turn complete — awaiting_clarification=False
+2026-06-25 19:06:48,503 | INFO | ================================================================================
+2026-06-25 19:07:23,382 | INFO | User query: antet policarpio
+2026-06-25 19:07:23,572 | INFO | Query received: antet policarpio
+2026-06-25 19:07:23,590 | INFO | BM25 returned 10 documents
+2026-06-25 19:07:26,346 | INFO | Dense returned 10 documents
+2026-06-25 19:07:26,347 | INFO | Merged into 14 unique documents
+2026-06-25 19:07:47,012 | INFO | Returned 4 reranked document(s)
+2026-06-25 19:07:47,013 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-25 19:07:48,662 | INFO | Chunk 1 | Score=+0.0006 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 19:07:48,663 | INFO | Chunk 2 | Score=+0.0003 | Source=Katipunan - Wikipedia.md
+2026-06-25 19:07:48,663 | INFO | Chunk 3 | Score=+0.0002 | Source=José Rizal - Wikipedia.md
+2026-06-25 19:07:48,663 | INFO | Chunk 4 | Score=+0.0001 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-25 19:07:48,665 | INFO | Streaming RAG chain for: 'antet policarpio'
+2026-06-25 19:08:46,783 | INFO | Stream complete (302 token(s))
+2026-06-25 19:08:46,790 | INFO | Generated response (185 chars)
+2026-06-25 19:08:46,791 | INFO | STEP 4 triggered — awaiting_clarification set to True
+2026-06-25 19:08:46,792 | INFO | ================================================================================
+2026-06-25 19:09:12,580 | INFO | User query: whatever
+2026-06-25 19:09:12,587 | INFO | Clarification reply received: whatever
+2026-06-25 19:09:12,600 | INFO | Clarification turn complete — awaiting_clarification=True
+2026-06-25 19:09:12,601 | INFO | ================================================================================
+2026-06-25 19:09:31,762 | INFO | User query: what?
+2026-06-25 19:09:31,765 | INFO | Clarification reply received: what?
+2026-06-25 19:09:31,781 | INFO | Clarification turn complete — awaiting_clarification=True
+2026-06-25 19:09:31,782 | INFO | ================================================================================
+2026-06-25 19:09:53,212 | INFO | User query: weeehh?
+2026-06-25 19:09:53,215 | INFO | Clarification reply received: weeehh?
+2026-06-25 19:09:53,224 | INFO | Clarification turn complete — awaiting_clarification=True
+2026-06-25 19:09:53,224 | INFO | ================================================================================
+2026-06-25 19:11:13,552 | INFO | User query: no
+2026-06-25 19:11:13,557 | INFO | Clarification reply received: no
+2026-06-25 19:11:13,600 | INFO | Clarification turn complete — awaiting_clarification=False
+2026-06-25 19:11:13,603 | INFO | ================================================================================

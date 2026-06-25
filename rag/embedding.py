@@ -1,5 +1,3 @@
-# rag/embedding.py
-
 import os                                              
 import pickle                                 # Standard library: serialize Python objects to disk
 
@@ -14,7 +12,7 @@ from qdrant_client.models import Distance, VectorParams            # Config obje
 # ── Configuration constants ──────────────────────────────────────────────────
 
 COLLECTION_NAME   = "rag_documents"       # Name of Qdrant collection that stores our vectors
-QDRANT_PATH       = "./qdrant_storage"    # Local folder where Qdrant will save data
+QDRANT_PATH       = "./qdrant_storage"  
 CHUNKS_CACHE_PATH = "./chunks_cache.pkl"  # Pickle file that caches split chunks for BM25 retriever re-use
 EMBEDDING_MODEL   = "BAAI/bge-m3"         
 CHUNK_SIZE        = 768                   
@@ -34,7 +32,7 @@ def get_embedding_model() -> HuggingFaceEmbeddings:
         encode_kwargs={"normalize_embeddings": True}   # normalise vectors
     )
 
-    print(f"[Embedding] ✅ Embedding model loaded.")   # Confirm successful load
+    print(f"[Embedding] ✅ Embedding model loaded.")
 
     return embeddings                                  
 
@@ -75,7 +73,7 @@ def build_vectorstore(chunks: list[Document]) -> QdrantVectorStore:
     ]
 
     if COLLECTION_NAME in existing_names:            # If collection already exists from a previous run
-        client.delete_collection(COLLECTION_NAME)    # delete it so it avoids duplicate vectors
+        client.delete_collection(COLLECTION_NAME)    # delete it to avoid duplicate vectors
         print(f"[Embedding] Deleted old collection '{COLLECTION_NAME}'")  # Log deletion
 
     client.create_collection(                        
