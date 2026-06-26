@@ -21,4 +21,12 @@ version 0.1	improvement
 	   	Added response loop if there is no 	
 	      		results found. Asking user if query	
 	      		is correct or has a typographical 	
-	      		error.	
+	      		error.
+version 0.2	improvement
+		Added Memory chat
+		Remove "load Indxed" button
+				incorporate the indexed loading
+				upon streamlit execution
+		Remove the "Chunks Information" box
+		Fixed the "source file" not visible in
+				assistant response history

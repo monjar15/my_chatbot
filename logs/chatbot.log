@@ -366,3 +366,734 @@
 2026-06-25 19:11:13,557 | INFO | Clarification reply received: no
 2026-06-25 19:11:13,600 | INFO | Clarification turn complete — awaiting_clarification=False
 2026-06-25 19:11:13,603 | INFO | ================================================================================
+2026-06-26 09:45:24,688 | INFO | Chatbot application started
+2026-06-26 09:45:39,083 | INFO | Loading existing index
+2026-06-26 09:45:53,961 | INFO | Loaded existing index (2002 chunks)
+2026-06-26 09:46:17,992 | INFO | User query: who is batman
+2026-06-26 09:46:18,163 | INFO | Query received: who is batman
+2026-06-26 09:46:18,257 | INFO | BM25 returned 10 documents
+2026-06-26 09:46:18,864 | INFO | Dense returned 10 documents
+2026-06-26 09:46:18,865 | INFO | Merged into 14 unique documents
+2026-06-26 09:46:42,491 | INFO | Returned 4 reranked document(s)
+2026-06-26 09:46:42,494 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 09:46:43,852 | INFO | Chunk 1 | Score=+0.1122 | Source=Katipunan - Wikipedia.md
+2026-06-26 09:46:43,852 | INFO | Chunk 2 | Score=+0.0180 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 09:46:43,852 | INFO | Chunk 3 | Score=+0.0094 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 09:46:43,853 | INFO | Chunk 4 | Score=+0.0080 | Source=José Rizal - Wikipedia.md
+2026-06-26 09:46:43,853 | INFO | Streaming RAG chain for: 'who is batman'
+2026-06-26 09:47:25,629 | INFO | Stream complete (227 token(s))
+2026-06-26 09:47:25,633 | INFO | Generated response (182 chars)
+2026-06-26 09:47:25,634 | INFO | STEP 4 triggered — awaiting_clarification set to True
+2026-06-26 09:47:25,635 | INFO | ================================================================================
+2026-06-26 09:47:37,339 | INFO | User query: no
+2026-06-26 09:47:37,344 | INFO | Clarification reply received: no
+2026-06-26 09:47:37,350 | INFO | ================================================================================
+2026-06-26 10:05:57,167 | INFO | User query: jose rizal
+2026-06-26 10:05:57,541 | INFO | Query received: jose rizal
+2026-06-26 10:05:57,584 | INFO | BM25 returned 10 documents
+2026-06-26 10:06:00,802 | INFO | Dense returned 10 documents
+2026-06-26 10:06:00,804 | INFO | Merged into 14 unique documents
+2026-06-26 10:06:19,933 | INFO | Returned 4 reranked document(s)
+2026-06-26 10:06:19,934 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 10:06:21,444 | INFO | Chunk 1 | Score=+0.9973 | Source=José Rizal - Wikipedia.md
+2026-06-26 10:06:21,445 | INFO | Chunk 2 | Score=+0.9646 | Source=José Rizal - Wikipedia.md
+2026-06-26 10:06:21,445 | INFO | Chunk 3 | Score=+0.9483 | Source=José Rizal - Wikipedia.md
+2026-06-26 10:06:21,445 | INFO | Chunk 4 | Score=+0.9411 | Source=José Rizal - Wikipedia.md
+2026-06-26 10:06:21,454 | INFO | Streaming RAG chain for: 'jose rizal'
+2026-06-26 10:07:37,836 | INFO | Stream complete (482 token(s))
+2026-06-26 10:07:37,848 | INFO | Generated response (910 chars)
+2026-06-26 10:07:37,857 | INFO | ================================================================================
+2026-06-26 10:25:42,353 | INFO | User query: who killed magellan?
+2026-06-26 10:25:42,687 | INFO | Query received: who killed magellan?
+2026-06-26 10:25:42,710 | INFO | BM25 returned 10 documents
+2026-06-26 10:25:45,937 | INFO | Dense returned 10 documents
+2026-06-26 10:25:45,938 | INFO | Merged into 14 unique documents
+2026-06-26 10:26:01,706 | INFO | Returned 4 reranked document(s)
+2026-06-26 10:26:01,707 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 10:26:03,180 | INFO | Chunk 1 | Score=+0.9612 | Source=History of the Philippines (1565–1898) - Wikipedia.md
+2026-06-26 10:26:03,181 | INFO | Chunk 2 | Score=+0.8015 | Source=History of the Philippines (1565–1898) - Wikipedia.md
+2026-06-26 10:26:03,181 | INFO | Chunk 3 | Score=+0.0874 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 10:26:03,182 | INFO | Chunk 4 | Score=+0.0374 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 10:26:03,193 | INFO | Streaming RAG chain for: 'who killed magellan?'
+2026-06-26 10:26:51,429 | INFO | Stream complete (224 token(s))
+2026-06-26 10:26:51,450 | INFO | Generated response (292 chars)
+2026-06-26 10:26:51,461 | INFO | ================================================================================
+2026-06-26 10:31:28,897 | INFO | User query: jose rizal
+2026-06-26 10:31:29,153 | INFO | Query received: jose rizal
+2026-06-26 10:31:29,173 | INFO | BM25 returned 10 documents
+2026-06-26 10:31:33,002 | INFO | Dense returned 10 documents
+2026-06-26 10:31:33,003 | INFO | Merged into 14 unique documents
+2026-06-26 10:31:54,309 | INFO | Returned 4 reranked document(s)
+2026-06-26 10:31:54,309 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 10:31:55,962 | INFO | Chunk 1 | Score=+0.9973 | Source=José Rizal - Wikipedia.md
+2026-06-26 10:31:55,962 | INFO | Chunk 2 | Score=+0.9646 | Source=José Rizal - Wikipedia.md
+2026-06-26 10:31:55,962 | INFO | Chunk 3 | Score=+0.9483 | Source=José Rizal - Wikipedia.md
+2026-06-26 10:31:55,963 | INFO | Chunk 4 | Score=+0.9411 | Source=José Rizal - Wikipedia.md
+2026-06-26 10:31:55,968 | INFO | Streaming RAG chain for: 'jose rizal'
+2026-06-26 10:33:11,819 | INFO | Stream complete (482 token(s))
+2026-06-26 10:33:11,832 | INFO | Generated response (910 chars)
+2026-06-26 10:33:11,844 | INFO | ================================================================================
+2026-06-26 10:33:19,570 | INFO | User query: how old is he?
+2026-06-26 10:33:19,766 | INFO | Query received: how old is he?
+2026-06-26 10:33:19,785 | INFO | BM25 returned 10 documents
+2026-06-26 10:33:22,829 | INFO | Dense returned 10 documents
+2026-06-26 10:33:22,830 | INFO | Merged into 14 unique documents
+2026-06-26 10:33:43,721 | INFO | Returned 4 reranked document(s)
+2026-06-26 10:33:43,724 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 10:33:45,616 | INFO | Chunk 1 | Score=+0.2471 | Source=Spanish–American War - Wikipedia.md
+2026-06-26 10:33:45,616 | INFO | Chunk 2 | Score=+0.0729 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-26 10:33:45,616 | INFO | Chunk 3 | Score=+0.0603 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 10:33:45,616 | INFO | Chunk 4 | Score=+0.0236 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 10:33:45,623 | INFO | Streaming RAG chain for: 'how old is he?'
+2026-06-26 10:35:15,164 | INFO | Stream complete (663 token(s))
+2026-06-26 10:35:15,171 | INFO | Generated response (527 chars)
+2026-06-26 10:35:15,189 | INFO | ================================================================================
+2026-06-26 10:36:21,325 | INFO | User query: Who are the ladies that had relationship with jose rizal?
+2026-06-26 10:36:21,555 | INFO | Query received: Who are the ladies that had relationship with jose rizal?
+2026-06-26 10:36:21,585 | INFO | BM25 returned 10 documents
+2026-06-26 10:36:25,010 | INFO | Dense returned 10 documents
+2026-06-26 10:36:25,011 | INFO | Merged into 14 unique documents
+2026-06-26 10:36:45,565 | INFO | Returned 4 reranked document(s)
+2026-06-26 10:36:45,569 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 10:36:47,160 | INFO | Chunk 1 | Score=+0.9807 | Source=José Rizal - Wikipedia.md
+2026-06-26 10:36:47,160 | INFO | Chunk 2 | Score=+0.8425 | Source=José Rizal - Wikipedia.md
+2026-06-26 10:36:47,160 | INFO | Chunk 3 | Score=+0.8032 | Source=José Rizal - Wikipedia.md
+2026-06-26 10:36:47,160 | INFO | Chunk 4 | Score=+0.7857 | Source=José Rizal - Wikipedia.md
+2026-06-26 10:36:47,166 | INFO | Streaming RAG chain for: 'Who are the ladies that had relationship with jose rizal?'
+2026-06-26 10:38:08,650 | INFO | Stream complete (526 token(s))
+2026-06-26 10:38:08,662 | INFO | Generated response (703 chars)
+2026-06-26 10:38:08,674 | INFO | ================================================================================
+2026-06-26 11:11:48,552 | INFO | User query: did lapu lapu killed magellan?
+2026-06-26 11:11:48,869 | INFO | Query received: did lapu lapu killed magellan?
+2026-06-26 11:11:48,900 | INFO | BM25 returned 10 documents
+2026-06-26 11:11:52,621 | INFO | Dense returned 10 documents
+2026-06-26 11:11:52,622 | INFO | Merged into 14 unique documents
+2026-06-26 11:12:08,624 | INFO | Returned 4 reranked document(s)
+2026-06-26 11:12:08,626 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 11:12:10,142 | INFO | Chunk 1 | Score=+0.9753 | Source=History of the Philippines (1565–1898) - Wikipedia.md
+2026-06-26 11:12:10,143 | INFO | Chunk 2 | Score=+0.0813 | Source=History of the Philippines (1565–1898) - Wikipedia.md
+2026-06-26 11:12:10,143 | INFO | Chunk 3 | Score=+0.0036 | Source=Gomburza - Wikipedia.md
+2026-06-26 11:12:10,143 | INFO | Chunk 4 | Score=+0.0026 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 11:12:10,149 | INFO | Streaming RAG chain for: 'did lapu lapu killed magellan?'
+2026-06-26 11:13:07,717 | INFO | Stream complete (220 token(s))
+2026-06-26 11:13:07,770 | INFO | Generated response (129 chars)
+2026-06-26 11:13:07,789 | INFO | ================================================================================
+2026-06-26 13:57:33,094 | INFO | Chatbot application started
+2026-06-26 13:58:07,162 | INFO | Loading existing index
+2026-06-26 13:58:21,409 | INFO | Loaded existing index (2002 chunks)
+2026-06-26 13:59:05,405 | INFO | User query: Can you explain the treaty of paris in detail?
+2026-06-26 13:59:05,677 | INFO | Query received: Can you explain the treaty of paris in detail?
+2026-06-26 13:59:05,748 | INFO | BM25 returned 10 documents
+2026-06-26 13:59:06,893 | INFO | Dense returned 10 documents
+2026-06-26 13:59:06,894 | INFO | Merged into 14 unique documents
+2026-06-26 13:59:40,916 | INFO | Returned 4 reranked document(s)
+2026-06-26 13:59:40,919 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 13:59:42,314 | INFO | Chunk 1 | Score=+0.5707 | Source=Treaty of Paris (1898) - Wikipedia.md
+2026-06-26 13:59:42,315 | INFO | Chunk 2 | Score=+0.5670 | Source=Treaty of Paris (1898) - Wikipedia.md
+2026-06-26 13:59:42,315 | INFO | Chunk 3 | Score=+0.3337 | Source=Treaty of Paris (1898) - Wikipedia.md
+2026-06-26 13:59:42,315 | INFO | Chunk 4 | Score=+0.2762 | Source=Treaty of Paris (1898) - Wikipedia.md
+2026-06-26 13:59:42,316 | INFO | Streaming RAG chain for: 'Can you explain the treaty of paris in detail?' | history_turns=0
+2026-06-26 14:01:04,604 | INFO | Stream complete (485 token(s))
+2026-06-26 14:01:04,617 | INFO | Generated response (1320 chars)
+2026-06-26 14:01:04,630 | INFO | ================================================================================
+2026-06-26 14:01:46,201 | INFO | User query: What it did
+2026-06-26 14:01:46,487 | INFO | Query received: What it did
+2026-06-26 14:01:46,502 | INFO | BM25 returned 10 documents
+2026-06-26 14:01:49,444 | INFO | Dense returned 10 documents
+2026-06-26 14:01:49,445 | INFO | Merged into 14 unique documents
+2026-06-26 14:02:07,012 | INFO | Returned 4 reranked document(s)
+2026-06-26 14:02:07,015 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 14:02:08,507 | INFO | Chunk 1 | Score=+0.2605 | Source=Katipunan - Wikipedia.md
+2026-06-26 14:02:08,507 | INFO | Chunk 2 | Score=+0.1067 | Source=José Rizal - Wikipedia.md
+2026-06-26 14:02:08,507 | INFO | Chunk 3 | Score=+0.0820 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-26 14:02:08,508 | INFO | Chunk 4 | Score=+0.0724 | Source=Spanish–American War - Wikipedia.md
+2026-06-26 14:02:08,519 | INFO | Streaming RAG chain for: 'What it did' | history_turns=2
+2026-06-26 14:03:04,163 | INFO | Stream complete (385 token(s))
+2026-06-26 14:03:04,173 | INFO | Generated response (719 chars)
+2026-06-26 14:03:04,184 | INFO | ================================================================================
+2026-06-26 14:03:18,675 | INFO | User query: Who killed Ferdinand Magellan?
+2026-06-26 14:03:18,882 | INFO | Query received: Who killed Ferdinand Magellan?
+2026-06-26 14:03:18,902 | INFO | BM25 returned 10 documents
+2026-06-26 14:03:21,626 | INFO | Dense returned 10 documents
+2026-06-26 14:03:21,626 | INFO | Merged into 14 unique documents
+2026-06-26 14:03:42,301 | INFO | Returned 4 reranked document(s)
+2026-06-26 14:03:42,315 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 14:03:44,416 | INFO | Chunk 1 | Score=+0.9924 | Source=History of the Philippines (1565–1898) - Wikipedia.md
+2026-06-26 14:03:44,417 | INFO | Chunk 2 | Score=+0.9924 | Source=History of the Philippines (1565–1898) - Wikipedia.md
+2026-06-26 14:03:44,419 | INFO | Chunk 3 | Score=+0.9416 | Source=History of the Philippines (1565–1898) - Wikipedia.md
+2026-06-26 14:03:44,419 | INFO | Chunk 4 | Score=+0.9416 | Source=History of the Philippines (1565–1898) - Wikipedia.md
+2026-06-26 14:03:44,438 | INFO | Streaming RAG chain for: 'Who killed Ferdinand Magellan?' | history_turns=4
+2026-06-26 14:04:54,545 | INFO | Stream complete (302 token(s))
+2026-06-26 14:04:54,556 | INFO | Generated response (470 chars)
+2026-06-26 14:04:54,568 | INFO | ================================================================================
+2026-06-26 14:06:26,870 | INFO | User query: Did Lapu lapu killed Magellan?
+2026-06-26 14:06:27,129 | INFO | Query received: Did Lapu lapu killed Magellan?
+2026-06-26 14:06:27,151 | INFO | BM25 returned 10 documents
+2026-06-26 14:06:31,403 | INFO | Dense returned 10 documents
+2026-06-26 14:06:31,404 | INFO | Merged into 14 unique documents
+2026-06-26 14:06:49,506 | INFO | Returned 4 reranked document(s)
+2026-06-26 14:06:49,507 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 14:06:50,885 | INFO | Chunk 1 | Score=+0.9853 | Source=History of the Philippines (1565–1898) - Wikipedia.md
+2026-06-26 14:06:50,885 | INFO | Chunk 2 | Score=+0.1837 | Source=History of the Philippines (1565–1898) - Wikipedia.md
+2026-06-26 14:06:50,885 | INFO | Chunk 3 | Score=+0.0034 | Source=Gomburza - Wikipedia.md
+2026-06-26 14:06:50,885 | INFO | Chunk 4 | Score=+0.0015 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-26 14:06:50,887 | INFO | Streaming RAG chain for: 'Did Lapu lapu killed Magellan?' | history_turns=6
+2026-06-26 14:08:10,530 | INFO | Stream complete (371 token(s))
+2026-06-26 14:08:10,537 | INFO | Generated response (758 chars)
+2026-06-26 14:08:10,546 | INFO | ================================================================================
+2026-06-26 14:27:10,658 | INFO | Auto-loaded existing index on startup (2002 chunks)
+2026-06-26 14:27:10,735 | INFO | Chatbot application started
+2026-06-26 14:27:26,238 | INFO | User query: who is jose rizal?
+2026-06-26 14:27:26,375 | INFO | Query received: who is jose rizal?
+2026-06-26 14:27:26,410 | INFO | BM25 returned 10 documents
+2026-06-26 14:27:26,831 | INFO | Dense returned 10 documents
+2026-06-26 14:27:26,831 | INFO | Merged into 14 unique documents
+2026-06-26 14:27:51,474 | INFO | Returned 4 reranked document(s)
+2026-06-26 14:27:51,476 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 14:27:52,857 | INFO | Chunk 1 | Score=+0.9995 | Source=José Rizal - Wikipedia.md
+2026-06-26 14:27:52,857 | INFO | Chunk 2 | Score=+0.9738 | Source=José Rizal - Wikipedia.md
+2026-06-26 14:27:52,857 | INFO | Chunk 3 | Score=+0.9553 | Source=José Rizal - Wikipedia.md
+2026-06-26 14:27:52,857 | INFO | Chunk 4 | Score=+0.9201 | Source=José Rizal - Wikipedia.md
+2026-06-26 14:27:52,859 | INFO | Streaming RAG chain for: 'who is jose rizal?' | history_turns=0
+2026-06-26 14:29:01,330 | INFO | Stream complete (379 token(s))
+2026-06-26 14:29:01,343 | INFO | Generated response (710 chars)
+2026-06-26 14:29:01,368 | INFO | ================================================================================
+2026-06-26 14:45:05,243 | INFO | Auto-loaded existing index on startup (2002 chunks)
+2026-06-26 14:45:05,350 | INFO | Chatbot application started
+2026-06-26 14:45:29,616 | INFO | User query: who is jose rizal?
+2026-06-26 14:45:29,776 | INFO | Query received: who is jose rizal?
+2026-06-26 14:45:29,808 | INFO | BM25 returned 10 documents
+2026-06-26 14:45:30,719 | INFO | Dense returned 10 documents
+2026-06-26 14:45:30,719 | INFO | Merged into 14 unique documents
+2026-06-26 14:45:54,067 | INFO | Returned 4 reranked document(s)
+2026-06-26 14:45:54,067 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 14:45:55,437 | INFO | Chunk 1 | Score=+0.9995 | Source=José Rizal - Wikipedia.md
+2026-06-26 14:45:55,437 | INFO | Chunk 2 | Score=+0.9738 | Source=José Rizal - Wikipedia.md
+2026-06-26 14:45:55,437 | INFO | Chunk 3 | Score=+0.9553 | Source=José Rizal - Wikipedia.md
+2026-06-26 14:45:55,437 | INFO | Chunk 4 | Score=+0.9201 | Source=José Rizal - Wikipedia.md
+2026-06-26 14:45:55,438 | INFO | Streaming RAG chain for: 'who is jose rizal?' | history_turns=0
+2026-06-26 14:46:58,467 | INFO | Stream complete (384 token(s))
+2026-06-26 14:46:58,480 | INFO | Generated response (660 chars)
+2026-06-26 14:46:58,484 | INFO | ================================================================================
+2026-06-26 14:47:27,881 | INFO | User query: how about apolinario mabini?
+2026-06-26 14:47:28,193 | INFO | Query received: how about apolinario mabini?
+2026-06-26 14:47:28,210 | INFO | BM25 returned 10 documents
+2026-06-26 14:47:30,914 | INFO | Dense returned 10 documents
+2026-06-26 14:47:30,917 | INFO | Merged into 14 unique documents
+2026-06-26 14:47:49,791 | INFO | Returned 4 reranked document(s)
+2026-06-26 14:47:49,793 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 14:47:51,346 | INFO | Chunk 1 | Score=+0.9974 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 14:47:51,346 | INFO | Chunk 2 | Score=+0.9540 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 14:47:51,346 | INFO | Chunk 3 | Score=+0.9500 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 14:47:51,346 | INFO | Chunk 4 | Score=+0.8855 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 14:47:51,352 | INFO | Streaming RAG chain for: 'how about apolinario mabini?' | history_turns=2
+2026-06-26 14:49:06,481 | INFO | Stream complete (443 token(s))
+2026-06-26 14:49:06,490 | INFO | Generated response (993 chars)
+2026-06-26 14:49:06,497 | INFO | ================================================================================
+2026-06-26 15:14:39,739 | INFO | Auto-loaded existing index on startup (2002 chunks)
+2026-06-26 15:14:39,820 | INFO | Chatbot application started
+2026-06-26 15:15:00,370 | INFO | User query: andres bonifacio
+2026-06-26 15:15:00,556 | INFO | Query received: andres bonifacio
+2026-06-26 15:15:00,586 | INFO | BM25 returned 10 documents
+2026-06-26 15:15:01,269 | INFO | Dense returned 10 documents
+2026-06-26 15:15:01,269 | INFO | Merged into 14 unique documents
+2026-06-26 15:15:29,847 | INFO | Returned 4 reranked document(s)
+2026-06-26 15:15:29,851 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 15:15:31,267 | INFO | Chunk 1 | Score=+0.9359 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 15:15:31,267 | INFO | Chunk 2 | Score=+0.8482 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 15:15:31,267 | INFO | Chunk 3 | Score=+0.8240 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 15:15:31,267 | INFO | Chunk 4 | Score=+0.8240 | Source=Philippine Revolution - Wikipedia.md
+2026-06-26 15:15:31,270 | INFO | Streaming RAG chain for: 'andres bonifacio' | history_turns=0
+2026-06-26 15:16:19,474 | INFO | Stream complete (278 token(s))
+2026-06-26 15:16:19,486 | INFO | Generated response (496 chars)
+2026-06-26 15:16:19,493 | INFO | ================================================================================
+2026-06-26 15:16:35,494 | INFO | User query: jose rizal
+2026-06-26 15:16:35,788 | INFO | Query received: jose rizal
+2026-06-26 15:16:35,804 | INFO | BM25 returned 10 documents
+2026-06-26 15:16:38,430 | INFO | Dense returned 10 documents
+2026-06-26 15:16:38,431 | INFO | Merged into 14 unique documents
+2026-06-26 15:16:58,960 | INFO | Returned 4 reranked document(s)
+2026-06-26 15:16:58,960 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 15:17:00,544 | INFO | Chunk 1 | Score=+0.9973 | Source=José Rizal - Wikipedia.md
+2026-06-26 15:17:00,544 | INFO | Chunk 2 | Score=+0.9646 | Source=José Rizal - Wikipedia.md
+2026-06-26 15:17:00,544 | INFO | Chunk 3 | Score=+0.9483 | Source=José Rizal - Wikipedia.md
+2026-06-26 15:17:00,544 | INFO | Chunk 4 | Score=+0.9411 | Source=José Rizal - Wikipedia.md
+2026-06-26 15:17:00,550 | INFO | Streaming RAG chain for: 'jose rizal' | history_turns=2
+2026-06-26 15:18:11,103 | INFO | Stream complete (418 token(s))
+2026-06-26 15:18:11,118 | INFO | Generated response (1023 chars)
+2026-06-26 15:18:11,127 | INFO | ================================================================================
+2026-06-26 16:34:11,556 | INFO | Chatbot application started
+2026-06-26 16:34:25,638 | INFO | Auto-loaded existing index (2002 chunks)
+2026-06-26 16:34:25,640 | INFO | Index is up to date — no new files detected
+2026-06-26 16:35:07,793 | INFO | New chat started — id=64a7aa6d-ceeb-48b7-bc1e-c01ecef76a2f
+2026-06-26 16:36:06,280 | INFO | Chatbot application started
+2026-06-26 16:36:18,356 | INFO | Auto-loaded existing index (2002 chunks)
+2026-06-26 16:36:18,357 | INFO | Index is up to date — no new files detected
+2026-06-26 16:36:29,820 | INFO | User query: jose rizal
+2026-06-26 16:36:29,964 | INFO | Query received: jose rizal
+2026-06-26 16:36:29,989 | INFO | BM25 returned 10 documents
+2026-06-26 16:36:30,226 | INFO | Dense returned 10 documents
+2026-06-26 16:36:30,226 | INFO | Merged into 14 unique documents
+2026-06-26 16:36:54,273 | INFO | Returned 4 reranked document(s)
+2026-06-26 16:36:54,275 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 16:36:55,549 | INFO | Chunk 1 | Score=+0.9973 | Source=José Rizal - Wikipedia.md
+2026-06-26 16:36:55,549 | INFO | Chunk 2 | Score=+0.9646 | Source=José Rizal - Wikipedia.md
+2026-06-26 16:36:55,549 | INFO | Chunk 3 | Score=+0.9483 | Source=José Rizal - Wikipedia.md
+2026-06-26 16:36:55,549 | INFO | Chunk 4 | Score=+0.9411 | Source=José Rizal - Wikipedia.md
+2026-06-26 16:36:55,550 | INFO | Streaming RAG chain for: 'jose rizal' | history_turns=0
+2026-06-26 16:37:56,575 | INFO | Stream complete (399 token(s))
+2026-06-26 16:37:56,583 | INFO | Generated response (940 chars)
+2026-06-26 16:37:56,590 | INFO | ================================================================================
+2026-06-26 16:38:18,679 | INFO | User query: andres bonifacio
+2026-06-26 16:38:18,991 | INFO | Query received: andres bonifacio
+2026-06-26 16:38:19,004 | INFO | BM25 returned 10 documents
+2026-06-26 16:38:21,923 | INFO | Dense returned 10 documents
+2026-06-26 16:38:21,923 | INFO | Merged into 14 unique documents
+2026-06-26 16:38:38,525 | INFO | Returned 4 reranked document(s)
+2026-06-26 16:38:38,529 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 16:38:40,163 | INFO | Chunk 1 | Score=+0.9359 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 16:38:40,164 | INFO | Chunk 2 | Score=+0.8482 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 16:38:40,164 | INFO | Chunk 3 | Score=+0.8240 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 16:38:40,164 | INFO | Chunk 4 | Score=+0.8240 | Source=Philippine Revolution - Wikipedia.md
+2026-06-26 16:38:40,173 | INFO | Streaming RAG chain for: 'andres bonifacio' | history_turns=2
+2026-06-26 16:39:34,688 | INFO | Stream complete (354 token(s))
+2026-06-26 16:39:34,693 | INFO | Generated response (448 chars)
+2026-06-26 16:39:34,703 | INFO | ================================================================================
+2026-06-26 16:39:44,939 | INFO | User query: apolinario mabini
+2026-06-26 16:39:45,138 | INFO | Query received: apolinario mabini
+2026-06-26 16:39:45,152 | INFO | BM25 returned 10 documents
+2026-06-26 16:39:47,771 | INFO | Dense returned 10 documents
+2026-06-26 16:39:47,772 | INFO | Merged into 14 unique documents
+2026-06-26 16:40:04,215 | INFO | Returned 4 reranked document(s)
+2026-06-26 16:40:04,216 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 16:40:05,758 | INFO | Chunk 1 | Score=+0.9860 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 16:40:05,758 | INFO | Chunk 2 | Score=+0.9655 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 16:40:05,758 | INFO | Chunk 3 | Score=+0.9647 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 16:40:05,758 | INFO | Chunk 4 | Score=+0.9400 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 16:40:05,766 | INFO | Streaming RAG chain for: 'apolinario mabini' | history_turns=4
+2026-06-26 16:41:26,011 | INFO | Stream complete (390 token(s))
+2026-06-26 16:41:26,020 | INFO | Generated response (705 chars)
+2026-06-26 16:41:26,027 | INFO | ================================================================================
+2026-06-26 16:47:39,291 | INFO | Chatbot application started
+2026-06-26 16:47:54,078 | INFO | Auto-loaded existing index (2002 chunks)
+2026-06-26 16:47:54,081 | INFO | Index is up to date — no new files detected
+2026-06-26 16:48:26,241 | INFO | User query: regression testing?
+2026-06-26 16:48:26,396 | INFO | Query received: regression testing?
+2026-06-26 16:48:26,421 | INFO | BM25 returned 10 documents
+2026-06-26 16:48:27,326 | INFO | Dense returned 10 documents
+2026-06-26 16:48:27,326 | INFO | Merged into 14 unique documents
+2026-06-26 16:48:51,928 | INFO | Returned 4 reranked document(s)
+2026-06-26 16:48:51,931 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 16:48:53,326 | INFO | Chunk 1 | Score=+0.0137 | Source=sample_rag_overview.txt
+2026-06-26 16:48:53,326 | INFO | Chunk 2 | Score=+0.0029 | Source=sample_rag_overview.txt
+2026-06-26 16:48:53,326 | INFO | Chunk 3 | Score=+0.0020 | Source=sample_rag_overview.txt
+2026-06-26 16:48:53,326 | INFO | Chunk 4 | Score=+0.0020 | Source=sample_rag_overview.txt
+2026-06-26 16:48:53,327 | INFO | Streaming RAG chain for: 'regression testing?' | history_turns=0
+2026-06-26 16:49:36,172 | INFO | Stream complete (222 token(s))
+2026-06-26 16:49:36,207 | INFO | Generated response (187 chars)
+2026-06-26 16:49:36,210 | INFO | STEP 4 triggered — awaiting_clarification set to True
+2026-06-26 16:49:36,210 | INFO | ================================================================================
+2026-06-26 16:50:05,202 | INFO | New chat started — id=c5c6c01c-8ecf-49e5-b78f-0604fe63e02a
+2026-06-26 17:25:46,974 | INFO | Chatbot application started
+2026-06-26 17:26:01,975 | INFO | Auto-loaded existing index (2002 chunks)
+2026-06-26 17:26:01,978 | WARNING | No manifest found — cannot detect new files; skipping incremental index
+2026-06-26 17:26:01,978 | INFO | Index is up to date — no new files detected
+2026-06-26 17:26:15,750 | INFO | User query: jose rizal
+2026-06-26 17:26:15,905 | INFO | Query received: jose rizal
+2026-06-26 17:26:15,940 | INFO | BM25 returned 10 documents
+2026-06-26 17:26:16,766 | INFO | Dense returned 10 documents
+2026-06-26 17:26:16,766 | INFO | Merged into 14 unique documents
+2026-06-26 17:26:43,292 | INFO | Returned 4 reranked document(s)
+2026-06-26 17:26:43,296 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 17:26:44,681 | INFO | Chunk 1 | Score=+0.9973 | Source=José Rizal - Wikipedia.md
+2026-06-26 17:26:44,681 | INFO | Chunk 2 | Score=+0.9646 | Source=José Rizal - Wikipedia.md
+2026-06-26 17:26:44,682 | INFO | Chunk 3 | Score=+0.9483 | Source=José Rizal - Wikipedia.md
+2026-06-26 17:26:44,682 | INFO | Chunk 4 | Score=+0.9411 | Source=José Rizal - Wikipedia.md
+2026-06-26 17:26:44,683 | INFO | Streaming RAG chain for: 'jose rizal' | history_turns=0
+2026-06-26 17:27:44,964 | INFO | Stream complete (399 token(s))
+2026-06-26 17:27:44,972 | INFO | Generated response (940 chars)
+2026-06-26 17:27:44,984 | INFO | ================================================================================
+2026-06-26 17:28:38,442 | INFO | User query: andres bonifacio?
+2026-06-26 17:28:38,734 | INFO | Query received: andres bonifacio?
+2026-06-26 17:28:38,748 | INFO | BM25 returned 10 documents
+2026-06-26 17:28:41,737 | INFO | Dense returned 10 documents
+2026-06-26 17:28:41,738 | INFO | Merged into 14 unique documents
+2026-06-26 17:28:59,055 | INFO | Returned 4 reranked document(s)
+2026-06-26 17:28:59,056 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 17:29:00,653 | INFO | Chunk 1 | Score=+0.9994 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 17:29:00,654 | INFO | Chunk 2 | Score=+0.9563 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 17:29:00,654 | INFO | Chunk 3 | Score=+0.9264 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 17:29:00,655 | INFO | Chunk 4 | Score=+0.9054 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 17:29:00,671 | INFO | Streaming RAG chain for: 'andres bonifacio?' | history_turns=2
+2026-06-26 17:30:07,900 | INFO | Stream complete (358 token(s))
+2026-06-26 17:30:07,908 | INFO | Generated response (571 chars)
+2026-06-26 17:30:07,917 | INFO | ================================================================================
+2026-06-26 17:30:22,827 | INFO | New chat started — id=b84278e0-44da-4baa-9d45-78531650921c
+2026-06-26 17:34:23,777 | INFO | Chatbot application started
+2026-06-26 17:34:36,692 | INFO | Auto-loaded existing index (2002 chunks)
+2026-06-26 17:34:36,693 | WARNING | No manifest found — cannot detect new files; skipping incremental index
+2026-06-26 17:34:36,693 | INFO | Index is up to date — no new files detected
+2026-06-26 17:35:31,086 | INFO | User query: andres bonifacio
+2026-06-26 17:35:31,226 | INFO | Query received: andres bonifacio
+2026-06-26 17:35:31,254 | INFO | BM25 returned 10 documents
+2026-06-26 17:35:32,026 | INFO | Dense returned 10 documents
+2026-06-26 17:35:32,026 | INFO | Merged into 14 unique documents
+2026-06-26 17:35:57,075 | INFO | Returned 4 reranked document(s)
+2026-06-26 17:35:57,076 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 17:35:58,295 | INFO | Chunk 1 | Score=+0.9359 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 17:35:58,295 | INFO | Chunk 2 | Score=+0.8482 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 17:35:58,296 | INFO | Chunk 3 | Score=+0.8240 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 17:35:58,296 | INFO | Chunk 4 | Score=+0.8240 | Source=Philippine Revolution - Wikipedia.md
+2026-06-26 17:35:58,296 | INFO | Streaming RAG chain for: 'andres bonifacio' | history_turns=0
+2026-06-26 17:36:46,294 | INFO | Stream complete (278 token(s))
+2026-06-26 17:36:46,305 | INFO | Generated response (496 chars)
+2026-06-26 17:36:46,309 | INFO | ================================================================================
+2026-06-26 17:37:03,829 | INFO | User query: what is his age?
+2026-06-26 17:37:04,059 | INFO | Query received: what is his age?
+2026-06-26 17:37:04,075 | INFO | BM25 returned 10 documents
+2026-06-26 17:37:06,772 | INFO | Dense returned 10 documents
+2026-06-26 17:37:06,774 | INFO | Merged into 14 unique documents
+2026-06-26 17:37:24,736 | INFO | Returned 4 reranked document(s)
+2026-06-26 17:37:24,737 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 17:37:26,156 | INFO | Chunk 1 | Score=+0.3325 | Source=Spanish–American War - Wikipedia.md
+2026-06-26 17:37:26,156 | INFO | Chunk 2 | Score=+0.1349 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-26 17:37:26,156 | INFO | Chunk 3 | Score=+0.1199 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 17:37:26,156 | INFO | Chunk 4 | Score=+0.0322 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 17:37:26,157 | INFO | Streaming RAG chain for: 'what is his age?' | history_turns=2
+2026-06-26 17:39:24,440 | INFO | Stream complete (855 token(s))
+2026-06-26 17:39:24,493 | INFO | Generated response (185 chars)
+2026-06-26 17:39:24,499 | INFO | STEP 4 triggered — awaiting_clarification set to True
+2026-06-26 17:39:24,500 | INFO | ================================================================================
+2026-06-26 17:42:09,351 | INFO | Chatbot application started
+2026-06-26 17:42:22,483 | INFO | Auto-loaded existing index (2002 chunks)
+2026-06-26 17:42:22,486 | WARNING | No manifest found — cannot detect new files; skipping incremental index
+2026-06-26 17:42:22,486 | INFO | Index is up to date — no new files detected
+2026-06-26 17:42:56,140 | INFO | User query: andres bonifacio?
+2026-06-26 17:42:56,280 | INFO | Query received: andres bonifacio?
+2026-06-26 17:42:56,312 | INFO | BM25 returned 10 documents
+2026-06-26 17:42:57,023 | INFO | Dense returned 0 documents
+2026-06-26 17:42:57,023 | INFO | Merged into 2 unique documents
+2026-06-26 17:43:10,217 | INFO | Returned 2 reranked document(s)
+2026-06-26 17:43:10,220 | INFO | Retrieved 2 reranked chunk(s)
+2026-06-26 17:43:11,942 | INFO | Chunk 1 | Score=+0.0001 | Source=Treaty of Paris (1898) - Wikipedia.md
+2026-06-26 17:43:11,942 | INFO | Chunk 2 | Score=+0.0000 | Source=Treaty of Paris (1898) - Wikipedia.md
+2026-06-26 17:43:11,942 | INFO | Streaming RAG chain for: 'andres bonifacio?' | history_turns=0
+2026-06-26 17:44:00,929 | INFO | Stream complete (343 token(s))
+2026-06-26 17:44:00,933 | INFO | Generated response (185 chars)
+2026-06-26 17:44:00,936 | INFO | STEP 4 triggered — awaiting_clarification set to True
+2026-06-26 17:44:00,936 | INFO | ================================================================================
+2026-06-26 17:46:16,139 | INFO | Chatbot application started
+2026-06-26 17:49:20,332 | INFO | Chatbot application started
+2026-06-26 17:50:54,324 | INFO | Chatbot application started
+2026-06-26 17:53:36,992 | INFO | Chatbot application started
+2026-06-26 17:54:48,694 | INFO | Chatbot application started
+2026-06-26 17:55:01,973 | INFO | No existing index found — starting full auto-indexing
+2026-06-26 17:55:02,178 | INFO | Loaded 1 document(s)
+2026-06-26 17:55:02,206 | INFO | Cleaned 1 document(s)
+2026-06-26 17:57:14,240 | INFO | Chatbot application started
+2026-06-26 17:57:25,831 | INFO | No existing index found — starting full auto-indexing
+2026-06-26 17:57:25,886 | INFO | Loaded 1 document(s)
+2026-06-26 17:57:25,894 | INFO | Cleaned 1 document(s)
+2026-06-26 17:59:11,144 | INFO | Chatbot application started
+2026-06-26 17:59:25,058 | INFO | Auto-loaded existing index (2002 chunks)
+2026-06-26 17:59:25,058 | WARNING | No manifest found — cannot detect new files; skipping incremental index
+2026-06-26 17:59:25,058 | INFO | Index is up to date — no new files detected
+2026-06-26 17:59:53,179 | INFO | User query: rizal
+2026-06-26 17:59:53,327 | INFO | Query received: rizal
+2026-06-26 17:59:53,354 | INFO | BM25 returned 10 documents
+2026-06-26 17:59:53,582 | INFO | Dense returned 10 documents
+2026-06-26 17:59:53,582 | INFO | Merged into 14 unique documents
+2026-06-26 18:00:17,202 | INFO | Returned 4 reranked document(s)
+2026-06-26 18:00:17,203 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 18:00:18,705 | INFO | Chunk 1 | Score=+0.9031 | Source=José Rizal - Wikipedia.md
+2026-06-26 18:00:18,705 | INFO | Chunk 2 | Score=+0.8969 | Source=José Rizal - Wikipedia.md
+2026-06-26 18:00:18,705 | INFO | Chunk 3 | Score=+0.8954 | Source=José Rizal - Wikipedia.md
+2026-06-26 18:00:18,705 | INFO | Chunk 4 | Score=+0.8737 | Source=José Rizal - Wikipedia.md
+2026-06-26 18:00:18,706 | INFO | Streaming RAG chain for: 'rizal' | history_turns=0
+2026-06-26 18:01:22,185 | INFO | Stream complete (410 token(s))
+2026-06-26 18:01:22,193 | INFO | Generated response (603 chars)
+2026-06-26 18:01:22,200 | INFO | ================================================================================
+2026-06-26 18:01:43,655 | INFO | User query: bonifacio
+2026-06-26 18:01:43,893 | INFO | Query received: bonifacio
+2026-06-26 18:01:43,903 | INFO | BM25 returned 10 documents
+2026-06-26 18:01:46,639 | INFO | Dense returned 10 documents
+2026-06-26 18:01:46,640 | INFO | Merged into 14 unique documents
+2026-06-26 18:02:06,022 | INFO | Returned 4 reranked document(s)
+2026-06-26 18:02:06,025 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 18:02:07,907 | INFO | Chunk 1 | Score=+0.9115 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 18:02:07,907 | INFO | Chunk 2 | Score=+0.8659 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 18:02:07,907 | INFO | Chunk 3 | Score=+0.8600 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 18:02:07,907 | INFO | Chunk 4 | Score=+0.5352 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 18:02:07,912 | INFO | Streaming RAG chain for: 'bonifacio' | history_turns=2
+2026-06-26 18:03:06,921 | INFO | Stream complete (330 token(s))
+2026-06-26 18:03:06,935 | INFO | Generated response (591 chars)
+2026-06-26 18:03:06,949 | INFO | ================================================================================
+2026-06-26 18:08:59,513 | INFO | Auto-loaded existing index on startup (2002 chunks)
+2026-06-26 18:08:59,649 | INFO | Chatbot application started
+2026-06-26 18:09:11,544 | INFO | New chat started — id=35dcdd71-eb69-47e5-90e0-b3a250945b6c
+2026-06-26 18:09:19,401 | INFO | User query: jose rizal
+2026-06-26 18:09:19,545 | INFO | Query received: jose rizal
+2026-06-26 18:09:19,573 | INFO | BM25 returned 10 documents
+2026-06-26 18:09:20,331 | INFO | Dense returned 10 documents
+2026-06-26 18:09:20,331 | INFO | Merged into 14 unique documents
+2026-06-26 18:09:44,702 | INFO | Returned 4 reranked document(s)
+2026-06-26 18:09:44,703 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 18:09:46,183 | INFO | Chunk 1 | Score=+0.9973 | Source=José Rizal - Wikipedia.md
+2026-06-26 18:09:46,184 | INFO | Chunk 2 | Score=+0.9646 | Source=José Rizal - Wikipedia.md
+2026-06-26 18:09:46,184 | INFO | Chunk 3 | Score=+0.9483 | Source=José Rizal - Wikipedia.md
+2026-06-26 18:09:46,184 | INFO | Chunk 4 | Score=+0.9411 | Source=José Rizal - Wikipedia.md
+2026-06-26 18:09:46,185 | INFO | Streaming RAG chain for: 'jose rizal' | history_turns=0
+2026-06-26 18:10:50,548 | INFO | Stream complete (399 token(s))
+2026-06-26 18:10:50,571 | INFO | Generated response (940 chars)
+2026-06-26 18:10:50,580 | INFO | ================================================================================
+2026-06-26 18:11:01,099 | INFO | User query: andres bonifacio
+2026-06-26 18:11:01,394 | INFO | Query received: andres bonifacio
+2026-06-26 18:11:01,409 | INFO | BM25 returned 10 documents
+2026-06-26 18:11:04,914 | INFO | Dense returned 10 documents
+2026-06-26 18:11:04,915 | INFO | Merged into 14 unique documents
+2026-06-26 18:11:23,674 | INFO | Returned 4 reranked document(s)
+2026-06-26 18:11:23,675 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 18:11:25,251 | INFO | Chunk 1 | Score=+0.9359 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 18:11:25,251 | INFO | Chunk 2 | Score=+0.8482 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 18:11:25,251 | INFO | Chunk 3 | Score=+0.8240 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 18:11:25,251 | INFO | Chunk 4 | Score=+0.8240 | Source=Philippine Revolution - Wikipedia.md
+2026-06-26 18:11:25,256 | INFO | Streaming RAG chain for: 'andres bonifacio' | history_turns=2
+2026-06-26 18:12:20,662 | INFO | Stream complete (354 token(s))
+2026-06-26 18:12:20,670 | INFO | Generated response (448 chars)
+2026-06-26 18:12:20,674 | INFO | ================================================================================
+2026-06-26 18:14:20,014 | INFO | User query: luna
+2026-06-26 18:14:20,219 | INFO | Query received: luna
+2026-06-26 18:14:20,238 | INFO | BM25 returned 10 documents
+2026-06-26 18:14:23,435 | INFO | Dense returned 10 documents
+2026-06-26 18:14:23,442 | INFO | Merged into 14 unique documents
+2026-06-26 18:14:56,780 | INFO | Returned 4 reranked document(s)
+2026-06-26 18:14:56,783 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 18:14:58,506 | INFO | Chunk 1 | Score=+0.7995 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-26 18:14:58,507 | INFO | Chunk 2 | Score=+0.4395 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-26 18:14:58,507 | INFO | Chunk 3 | Score=+0.1928 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-26 18:14:58,507 | INFO | Chunk 4 | Score=+0.1011 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-26 18:14:58,508 | INFO | Streaming RAG chain for: 'luna' | history_turns=4
+2026-06-26 18:16:13,578 | INFO | Stream complete (454 token(s))
+2026-06-26 18:16:13,585 | INFO | Generated response (716 chars)
+2026-06-26 18:16:13,592 | INFO | ================================================================================
+2026-06-26 18:16:25,287 | INFO | User query: mabini
+2026-06-26 18:16:25,650 | INFO | Query received: mabini
+2026-06-26 18:16:25,663 | INFO | BM25 returned 10 documents
+2026-06-26 18:16:28,588 | INFO | Dense returned 10 documents
+2026-06-26 18:16:28,589 | INFO | Merged into 14 unique documents
+2026-06-26 18:16:49,337 | INFO | Returned 4 reranked document(s)
+2026-06-26 18:16:49,342 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 18:16:51,691 | INFO | Chunk 1 | Score=+0.9466 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 18:16:51,692 | INFO | Chunk 2 | Score=+0.9374 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 18:16:51,692 | INFO | Chunk 3 | Score=+0.9216 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 18:16:51,693 | INFO | Chunk 4 | Score=+0.8687 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 18:16:51,697 | INFO | Streaming RAG chain for: 'mabini' | history_turns=6
+2026-06-26 18:18:18,992 | INFO | Stream complete (393 token(s))
+2026-06-26 18:18:19,010 | INFO | Generated response (821 chars)
+2026-06-26 18:18:19,018 | INFO | ================================================================================
+2026-06-26 18:25:04,553 | INFO | Auto-loaded existing index on startup (2002 chunks)
+2026-06-26 18:25:04,695 | INFO | Chatbot application started
+2026-06-26 18:25:28,441 | INFO | User query: jose rizal
+2026-06-26 18:25:28,598 | INFO | Query received: jose rizal
+2026-06-26 18:25:28,630 | INFO | BM25 returned 10 documents
+2026-06-26 18:25:29,200 | INFO | Dense returned 10 documents
+2026-06-26 18:25:29,200 | INFO | Merged into 14 unique documents
+2026-06-26 18:25:53,608 | INFO | Returned 4 reranked document(s)
+2026-06-26 18:25:53,609 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 18:25:54,997 | INFO | Chunk 1 | Score=+0.9973 | Source=José Rizal - Wikipedia.md
+2026-06-26 18:25:54,997 | INFO | Chunk 2 | Score=+0.9646 | Source=José Rizal - Wikipedia.md
+2026-06-26 18:25:54,997 | INFO | Chunk 3 | Score=+0.9483 | Source=José Rizal - Wikipedia.md
+2026-06-26 18:25:54,997 | INFO | Chunk 4 | Score=+0.9411 | Source=José Rizal - Wikipedia.md
+2026-06-26 18:25:54,998 | INFO | Streaming RAG chain for: 'jose rizal' | history_turns=0
+2026-06-26 18:26:58,982 | INFO | Stream complete (399 token(s))
+2026-06-26 18:26:59,004 | INFO | Generated response (940 chars)
+2026-06-26 18:26:59,010 | INFO | ================================================================================
+2026-06-26 18:27:26,879 | INFO | User query: bonifacio
+2026-06-26 18:27:27,180 | INFO | Query received: bonifacio
+2026-06-26 18:27:27,190 | INFO | BM25 returned 10 documents
+2026-06-26 18:27:30,105 | INFO | Dense returned 10 documents
+2026-06-26 18:27:30,106 | INFO | Merged into 14 unique documents
+2026-06-26 18:27:47,690 | INFO | Returned 4 reranked document(s)
+2026-06-26 18:27:47,691 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 18:27:49,318 | INFO | Chunk 1 | Score=+0.9115 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 18:27:49,319 | INFO | Chunk 2 | Score=+0.8659 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 18:27:49,319 | INFO | Chunk 3 | Score=+0.8600 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 18:27:49,319 | INFO | Chunk 4 | Score=+0.5352 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 18:27:49,325 | INFO | Streaming RAG chain for: 'bonifacio' | history_turns=2
+2026-06-26 18:28:46,375 | INFO | Stream complete (300 token(s))
+2026-06-26 18:28:46,386 | INFO | Generated response (523 chars)
+2026-06-26 18:28:46,391 | INFO | ================================================================================
+2026-06-26 18:28:49,555 | INFO | User query: luna
+2026-06-26 18:28:49,810 | INFO | Query received: luna
+2026-06-26 18:28:49,825 | INFO | BM25 returned 10 documents
+2026-06-26 18:28:53,252 | INFO | Dense returned 10 documents
+2026-06-26 18:28:53,253 | INFO | Merged into 14 unique documents
+2026-06-26 18:29:19,568 | INFO | Returned 4 reranked document(s)
+2026-06-26 18:29:19,572 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 18:29:21,452 | INFO | Chunk 1 | Score=+0.7995 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-26 18:29:21,452 | INFO | Chunk 2 | Score=+0.4395 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-26 18:29:21,453 | INFO | Chunk 3 | Score=+0.1928 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-26 18:29:21,453 | INFO | Chunk 4 | Score=+0.1011 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-26 18:29:21,470 | INFO | Streaming RAG chain for: 'luna' | history_turns=4
+2026-06-26 18:30:50,235 | INFO | Stream complete (532 token(s))
+2026-06-26 18:30:50,249 | INFO | Generated response (803 chars)
+2026-06-26 18:30:50,254 | INFO | ================================================================================
+2026-06-26 18:32:16,214 | INFO | Switched to chat id=5b022fee-7857-45f8-b7c6-87b30018545a
+2026-06-26 18:32:17,666 | INFO | Switched to chat id=5b022fee-7857-45f8-b7c6-87b30018545a
+2026-06-26 18:32:18,282 | INFO | Switched to chat id=5b022fee-7857-45f8-b7c6-87b30018545a
+2026-06-26 18:32:18,598 | INFO | Switched to chat id=5b022fee-7857-45f8-b7c6-87b30018545a
+2026-06-26 18:32:19,232 | INFO | Switched to chat id=5b022fee-7857-45f8-b7c6-87b30018545a
+2026-06-26 18:32:21,664 | INFO | Switched to chat id=5b022fee-7857-45f8-b7c6-87b30018545a
+2026-06-26 18:32:27,107 | INFO | Switched to chat id=5b022fee-7857-45f8-b7c6-87b30018545a
+2026-06-26 18:32:46,722 | INFO | Switched to chat id=5b022fee-7857-45f8-b7c6-87b30018545a
+2026-06-26 18:33:09,497 | INFO | Switched to chat id=5b022fee-7857-45f8-b7c6-87b30018545a
+2026-06-26 18:33:10,865 | INFO | Switched to chat id=5b022fee-7857-45f8-b7c6-87b30018545a
+2026-06-26 18:33:13,059 | INFO | Switched to chat id=5b022fee-7857-45f8-b7c6-87b30018545a
+2026-06-26 18:33:15,126 | INFO | New chat started — id=9a873328-8f98-4bc3-b3d5-a80c4d003019
+2026-06-26 18:33:18,270 | INFO | New chat started — id=d6c379aa-f076-464d-b041-4fed02838b88
+2026-06-26 18:33:20,307 | INFO | Switched to chat id=5b022fee-7857-45f8-b7c6-87b30018545a
+2026-06-26 18:33:31,171 | INFO | New chat started — id=f53e97d3-c74d-4e41-8009-efad602596be
+2026-06-26 18:33:34,126 | INFO | Switched to chat id=5b022fee-7857-45f8-b7c6-87b30018545a
+2026-06-26 18:33:37,452 | INFO | New chat started — id=cf9d3105-0450-49b8-b63a-f493d2ac52ea
+2026-06-26 18:33:40,817 | INFO | User query: luna
+2026-06-26 18:33:41,027 | INFO | Query received: luna
+2026-06-26 18:33:41,045 | INFO | BM25 returned 10 documents
+2026-06-26 18:33:44,142 | INFO | Dense returned 10 documents
+2026-06-26 18:33:44,142 | INFO | Merged into 14 unique documents
+2026-06-26 18:34:02,496 | INFO | Returned 4 reranked document(s)
+2026-06-26 18:34:02,500 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 18:34:04,906 | INFO | Chunk 1 | Score=+0.7995 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-26 18:34:04,906 | INFO | Chunk 2 | Score=+0.4395 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-26 18:34:04,906 | INFO | Chunk 3 | Score=+0.1928 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-26 18:34:04,906 | INFO | Chunk 4 | Score=+0.1011 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-26 18:34:04,908 | INFO | Streaming RAG chain for: 'luna' | history_turns=0
+2026-06-26 18:34:52,475 | INFO | Stream complete (340 token(s))
+2026-06-26 18:34:52,495 | INFO | Generated response (779 chars)
+2026-06-26 18:34:52,502 | INFO | ================================================================================
+2026-06-26 18:34:57,694 | INFO | User query: mabini
+2026-06-26 18:34:58,043 | INFO | Query received: mabini
+2026-06-26 18:34:58,058 | INFO | BM25 returned 10 documents
+2026-06-26 18:35:01,412 | INFO | Dense returned 10 documents
+2026-06-26 18:35:01,412 | INFO | Merged into 14 unique documents
+2026-06-26 18:35:21,530 | INFO | Returned 4 reranked document(s)
+2026-06-26 18:35:21,534 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 18:35:23,799 | INFO | Chunk 1 | Score=+0.9466 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 18:35:23,800 | INFO | Chunk 2 | Score=+0.9374 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 18:35:23,800 | INFO | Chunk 3 | Score=+0.9216 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 18:35:23,800 | INFO | Chunk 4 | Score=+0.8687 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 18:35:23,821 | INFO | Streaming RAG chain for: 'mabini' | history_turns=2
+2026-06-26 18:35:51,064 | INFO | User query: bonifacio
+2026-06-26 18:35:51,398 | INFO | Query received: bonifacio
+2026-06-26 18:35:51,412 | INFO | BM25 returned 10 documents
+2026-06-26 18:35:57,993 | INFO | Dense returned 10 documents
+2026-06-26 18:35:57,995 | INFO | Merged into 14 unique documents
+2026-06-26 18:36:42,609 | INFO | Returned 4 reranked document(s)
+2026-06-26 18:36:42,613 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 18:36:45,154 | INFO | Chunk 1 | Score=+0.9115 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 18:36:45,154 | INFO | Chunk 2 | Score=+0.8659 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 18:36:45,154 | INFO | Chunk 3 | Score=+0.8600 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 18:36:45,156 | INFO | Chunk 4 | Score=+0.5352 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 18:36:45,167 | INFO | Streaming RAG chain for: 'bonifacio' | history_turns=2
+2026-06-26 18:37:55,684 | INFO | Stream complete (314 token(s))
+2026-06-26 18:37:55,734 | INFO | Generated response (528 chars)
+2026-06-26 18:37:55,740 | INFO | ================================================================================
+2026-06-26 18:39:32,602 | INFO | New chat started — id=b86531e0-d014-46e6-99a4-c78ea9d932d9
+2026-06-26 18:40:50,828 | INFO | Indexing started for folder: ./documents
+2026-06-26 18:40:51,261 | INFO | Loaded 13 document(s)
+2026-06-26 18:40:51,350 | INFO | Cleaned 13 document(s)
+2026-06-26 18:40:51,448 | INFO | Generated 1812 chunk(s)
+2026-06-26 18:40:58,411 | INFO | New chat started — id=7c3acc1a-2eac-4697-9e8a-696143650f2b
+2026-06-26 18:41:01,628 | INFO | New chat started — id=b4b3a2f7-c7d6-4101-b384-539b702db942
+2026-06-26 18:41:07,780 | INFO | New chat started — id=da1fe321-e032-4088-8909-b8694680aa79
+2026-06-26 22:04:38,582 | INFO | Auto-loaded existing index on startup (2002 chunks)
+2026-06-26 22:04:38,683 | INFO | Chatbot application started
+2026-06-26 22:06:30,699 | INFO | User query: jose rizal
+2026-06-26 22:06:30,874 | INFO | Query received: jose rizal
+2026-06-26 22:06:30,904 | INFO | BM25 returned 10 documents
+2026-06-26 22:06:31,209 | INFO | Dense returned 10 documents
+2026-06-26 22:06:31,210 | INFO | Merged into 14 unique documents
+2026-06-26 22:06:56,228 | INFO | Returned 4 reranked document(s)
+2026-06-26 22:06:56,232 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 22:06:57,631 | INFO | Chunk 1 | Score=+0.9973 | Source=José Rizal - Wikipedia.md
+2026-06-26 22:06:57,631 | INFO | Chunk 2 | Score=+0.9646 | Source=José Rizal - Wikipedia.md
+2026-06-26 22:06:57,631 | INFO | Chunk 3 | Score=+0.9483 | Source=José Rizal - Wikipedia.md
+2026-06-26 22:06:57,631 | INFO | Chunk 4 | Score=+0.9411 | Source=José Rizal - Wikipedia.md
+2026-06-26 22:06:57,633 | INFO | Streaming RAG chain for: 'jose rizal' | history_turns=0
+2026-06-26 22:08:01,504 | INFO | New chat started — id=b77bcad9-4a30-44e1-bd08-de1985fd72aa
+2026-06-26 22:08:13,721 | INFO | User query: jose rizal
+2026-06-26 22:08:13,927 | INFO | Query received: jose rizal
+2026-06-26 22:08:13,940 | INFO | BM25 returned 10 documents
+2026-06-26 22:08:16,586 | INFO | Dense returned 10 documents
+2026-06-26 22:08:16,586 | INFO | Merged into 14 unique documents
+2026-06-26 22:08:33,559 | INFO | Returned 4 reranked document(s)
+2026-06-26 22:08:33,560 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 22:08:35,011 | INFO | Chunk 1 | Score=+0.9973 | Source=José Rizal - Wikipedia.md
+2026-06-26 22:08:35,012 | INFO | Chunk 2 | Score=+0.9646 | Source=José Rizal - Wikipedia.md
+2026-06-26 22:08:35,012 | INFO | Chunk 3 | Score=+0.9483 | Source=José Rizal - Wikipedia.md
+2026-06-26 22:08:35,012 | INFO | Chunk 4 | Score=+0.9411 | Source=José Rizal - Wikipedia.md
+2026-06-26 22:08:35,015 | INFO | Streaming RAG chain for: 'jose rizal' | history_turns=0
+2026-06-26 22:09:10,657 | INFO | Stream complete (399 token(s))
+2026-06-26 22:09:10,661 | INFO | Generated response (895 chars)
+2026-06-26 22:09:10,664 | INFO | ================================================================================
+2026-06-26 22:09:21,199 | INFO | User query: andres bonifacio
+2026-06-26 22:09:21,415 | INFO | Query received: andres bonifacio
+2026-06-26 22:09:21,419 | INFO | BM25 returned 10 documents
+2026-06-26 22:09:23,949 | INFO | Dense returned 10 documents
+2026-06-26 22:09:23,949 | INFO | Merged into 14 unique documents
+2026-06-26 22:09:40,475 | INFO | Returned 4 reranked document(s)
+2026-06-26 22:09:40,475 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 22:09:42,150 | INFO | Chunk 1 | Score=+0.9359 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 22:09:42,150 | INFO | Chunk 2 | Score=+0.8482 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 22:09:42,151 | INFO | Chunk 3 | Score=+0.8240 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 22:09:42,151 | INFO | Chunk 4 | Score=+0.8240 | Source=Philippine Revolution - Wikipedia.md
+2026-06-26 22:09:42,152 | INFO | Streaming RAG chain for: 'andres bonifacio' | history_turns=2
+2026-06-26 22:10:46,930 | INFO | Stream complete (406 token(s))
+2026-06-26 22:10:46,951 | INFO | Generated response (495 chars)
+2026-06-26 22:10:46,958 | INFO | ================================================================================
+2026-06-26 22:18:46,600 | INFO | Auto-loaded existing index on startup (2002 chunks)
+2026-06-26 22:18:46,705 | INFO | Chatbot application started
+2026-06-26 22:18:56,909 | INFO | User query: jose rizal
+2026-06-26 22:18:57,067 | INFO | Query received: jose rizal
+2026-06-26 22:18:57,094 | INFO | BM25 returned 10 documents
+2026-06-26 22:18:57,446 | INFO | Dense returned 10 documents
+2026-06-26 22:18:57,446 | INFO | Merged into 14 unique documents
+2026-06-26 22:19:20,957 | INFO | Returned 4 reranked document(s)
+2026-06-26 22:19:20,957 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 22:19:22,372 | INFO | Chunk 1 | Score=+0.9973 | Source=José Rizal - Wikipedia.md
+2026-06-26 22:19:22,372 | INFO | Chunk 2 | Score=+0.9646 | Source=José Rizal - Wikipedia.md
+2026-06-26 22:19:22,372 | INFO | Chunk 3 | Score=+0.9483 | Source=José Rizal - Wikipedia.md
+2026-06-26 22:19:22,372 | INFO | Chunk 4 | Score=+0.9411 | Source=José Rizal - Wikipedia.md
+2026-06-26 22:19:22,372 | INFO | Streaming RAG chain for: 'jose rizal' | history_turns=0
+2026-06-26 22:20:29,175 | INFO | Stream complete (399 token(s))
+2026-06-26 22:20:29,203 | INFO | Generated response (940 chars)
+2026-06-26 22:20:29,211 | INFO | ================================================================================
+2026-06-26 22:20:46,353 | INFO | User query: andres bonifacio
+2026-06-26 22:20:46,660 | INFO | Query received: andres bonifacio
+2026-06-26 22:20:46,675 | INFO | BM25 returned 10 documents
+2026-06-26 22:20:50,091 | INFO | Dense returned 10 documents
+2026-06-26 22:20:50,095 | INFO | Merged into 14 unique documents
+2026-06-26 22:21:08,245 | INFO | Returned 4 reranked document(s)
+2026-06-26 22:21:08,248 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 22:21:09,974 | INFO | Chunk 1 | Score=+0.9359 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 22:21:09,974 | INFO | Chunk 2 | Score=+0.8482 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 22:21:09,975 | INFO | Chunk 3 | Score=+0.8240 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-26 22:21:09,975 | INFO | Chunk 4 | Score=+0.8240 | Source=Philippine Revolution - Wikipedia.md
+2026-06-26 22:21:09,990 | INFO | Streaming RAG chain for: 'andres bonifacio' | history_turns=2
+2026-06-26 22:22:06,607 | INFO | Stream complete (354 token(s))
+2026-06-26 22:22:06,621 | INFO | Generated response (448 chars)
+2026-06-26 22:22:06,629 | INFO | ================================================================================
+2026-06-26 22:22:19,020 | INFO | User query: mabini
+2026-06-26 22:22:19,473 | INFO | Query received: mabini
+2026-06-26 22:22:19,527 | INFO | BM25 returned 10 documents
+2026-06-26 22:22:22,497 | INFO | Dense returned 10 documents
+2026-06-26 22:22:22,498 | INFO | Merged into 14 unique documents
+2026-06-26 22:22:40,097 | INFO | Returned 4 reranked document(s)
+2026-06-26 22:22:40,097 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-26 22:22:41,521 | INFO | Chunk 1 | Score=+0.9466 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 22:22:41,521 | INFO | Chunk 2 | Score=+0.9374 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 22:22:41,521 | INFO | Chunk 3 | Score=+0.9216 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 22:22:41,521 | INFO | Chunk 4 | Score=+0.8687 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-26 22:22:41,523 | INFO | Streaming RAG chain for: 'mabini' | history_turns=4
+2026-06-26 22:24:10,085 | INFO | Stream complete (455 token(s))
+2026-06-26 22:24:10,097 | INFO | Generated response (707 chars)
+2026-06-26 22:24:10,105 | INFO | ================================================================================

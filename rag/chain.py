@@ -47,13 +47,21 @@ CONTEXT:
 {context}
 ──────────────────────────────────────────
 
+CHAT HISTORY (most recent turns, for reference only):
+{chat_history}
+
+──────────────────────────────────────────
+
 QUESTION: {question}
 
 ──────────────────────────────────────────
 INSTRUCTIONS — follow in this exact order:
 
 STEP 1 — SEARCH: Carefully read every sentence in the CONTEXT above \
-and identify all passages that are relevant to the QUESTION.
+and identify all passages that are relevant to the QUESTION. \
+You may use the CHAT HISTORY to understand follow-up questions \
+(e.g. resolving pronouns like "it", "that", "they", "him", "her", "he", or "she"), \
+but NEVER use history as a knowledge source.
 
 STEP 2 — ANSWER: If relevant information is found, construct a clear, \
 concise, and professional answer using ONLY those passages. \
@@ -114,27 +122,43 @@ def _format_context(docs_with_scores: list[tuple[Document, float]]) -> str:
 
 def run_rag_chain_stream(
     query: str,
-    docs_with_scores: list[tuple[Document, float]]
+    docs_with_scores: list[tuple[Document, float]],
+    chat_history: list[dict] | None = None,            # list of {"role": .., "content": ..} dicts
+    max_history_turns: int = 5                         # how many past exchanges to include
 ) -> Generator[str, None, None]:
 
     llm     = get_llm()                                # Initialise the LLM
     prompt  = _build_prompt()                          # Get the prompt template
     context = _format_context(docs_with_scores)        # Format retrieved chunks into a context string
 
+    # ── Format chat history into a readable string for the prompt ──
+    # Each turn is labelled User/Assistant and separated by a blank line.
+    # We trim to the last `max_history_turns` exchanges (1 exchange = 1 user + 1 assistant msg).
+    if chat_history:
+        recent   = chat_history[-(max_history_turns * 2):]          # Slice to keep N most recent turns
+        history_lines = []
+        for msg in recent:
+            role_label = "User" if msg["role"] == "user" else "Assistant"
+            history_lines.append(f"{role_label}: {msg['content']}")
+        history_str = "\n".join(history_lines)                       # One line per message
+    else:
+        history_str = "(No prior conversation)"                      # Placeholder when history is empty
+
     # ── Build LCEL chain (same structure as non-streaming) ──
     chain = prompt | llm | StrOutputParser()           # Pipe: prompt template → LLM → string parser
     
     logger.info(                                       # Record stream start
-        f"Streaming RAG chain for: '{query}'"
+        f"Streaming RAG chain for: '{query}' | history_turns={len(chat_history or [])}"
     )
 
-    print(f"[Chain] Streaming RAG chain for: '{query}'")               # Log stream start
+    print(f"[Chain] Streaming RAG chain for: '{query}' | history_turns={len(chat_history or [])}")                                                 # Log stream start
 
     token_count = 0                                    # Counter to track total streamed tokens
 
     for token in chain.stream({                        # .stream() yields partial text chunks instead of blocking
         "context":  context,                           # Formatted retrieved passages
-        "question": query                              # User's question
+        "question": query,                              # User's question
+        "chat_history": history_str,                   # pass formatted history to prompt
     }):
         token_count += 1                               # Increment token counter
         yield token                                    # Yield the current token to the Streamlit caller

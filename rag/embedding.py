@@ -144,4 +144,4 @@ def load_chunks_cache() -> list[Document]:
 
     print(f"[Embedding] ✅ Loaded {len(chunks)} chunks from cache '{CHUNKS_CACHE_PATH}'")  # Confirm load
 
-    return chunks                                    
+    return chunks

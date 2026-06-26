@@ -36,6 +36,27 @@ def format_timestamp(dt: datetime) -> str:
     return dt.strftime("%I:%M %p · %b %d, %Y")           # e.g. 02:45 PM · Jun 25, 2026
 
 
+# ── Auto-load existing index on startup (runs once per session) ───────────────
+
+if not st.session_state.get("indexed", False):         # Only attempt if not already loaded this session
+    try:
+        _vectorstore = load_vectorstore()              # Try loading Qdrant collection from disk
+        _chunks      = load_chunks_cache()             # Try loading BM25 chunk cache from disk
+
+        st.session_state["indexed"]     = True         # Mark as indexed
+        st.session_state["vectorstore"] = _vectorstore # Store vectorstore in session
+        st.session_state["chunks"]      = _chunks      # Store chunks in session
+
+        logger.info(                                   # Log successful auto-load
+            f"Auto-loaded existing index on startup ({len(_chunks)} chunks)"
+        )
+
+    except FileNotFoundError:                          # No index found on disk — silent, user must index manually
+        logger.info(
+            "No existing index found on startup — user must index documents via sidebar"
+        )
+
+
 # ── Page configuration (must be the very first Streamlit call) ───────────────
 
 st.set_page_config(                                    # Configure the Streamlit page metadata
@@ -128,42 +149,6 @@ with st.sidebar:                                       # Everything indented her
 
     st.divider()                                           # Visual separator in sidebar
 
-    # ── Load existing index button ──
-    st.caption("Already indexed? Load without re-processing:")         # Helper text above button
-
-    if st.button("📂 Load Existing Index", use_container_width=True):  # Button to reload a previously built index
-
-        logger.info(                                                    # Record index loading request
-            "Loading existing index"
-        )
-                
-        with st.spinner("⏳ Loading existing index from disk..."):     # Spinner while loading
-            try:
-                vectorstore = load_vectorstore()                       # Load Qdrant collection from qdrant_storage/
-                chunks      = load_chunks_cache()                      # Load BM25 chunk list from chunks_cache.pkl
-
-                st.session_state["indexed"]     = True                 # Mark as indexed
-                st.session_state["chunks"]      = chunks               # Store in session
-                st.session_state["vectorstore"] = vectorstore          # Store in session
-
-                logger.info(                                           # Record successful index load
-                    f"Loaded existing index ({len(chunks)} chunks)"
-                )
-
-                st.success("✅ Existing index loaded successfully!")    # Confirm success
-
-            except FileNotFoundError as e:                             # Handle missing files gracefully
-                st.error(f"❌ {e}")                                    # Show specific error message
-
-    st.divider()                                           # Visual separator
-
-    # ── Status indicator ──
-    if st.session_state.get("indexed", False):             # Check if documents have been indexed
-        chunk_count = len(st.session_state.get("chunks", []))  # Count cached chunks
-        st.success(f"✅ Index ready ({chunk_count} chunks)")    # Green status pill
-    else:
-        st.warning("⚠️ No index loaded. Index documents first.")  # Yellow warning
-
 
 # ══════════════════════════════════════════════════════════════════════════════
 # SESSION STATE – initialise all keys on first load
@@ -172,18 +157,24 @@ with st.sidebar:                                       # Everything indented her
 if "messages" not in st.session_state:               # Only initialise if the key doesn't exist yet
     st.session_state["messages"] = []                # Full conversation history for display
 
+if "chat_history" not in st.session_state:
+    st.session_state["chat_history"] = []            # plain memory list fed to the LLM prompt
+
 if "awaiting_clarification" not in st.session_state:
     st.session_state["awaiting_clarification"] = False
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # MAIN AREA – Chat interface
+# This code is responsible for re-displaying all previous chat messages 
+#    stored in Streamlit's session state whenever the app reruns.
 # ══════════════════════════════════════════════════════════════════════════════
 
 for msg in st.session_state["messages"]:                    # Loop over every past message
 
     # Retrieve the saved timestamp string (fallback to empty string if somehow missing)
     ts = msg.get("timestamp", "")                           # pull saved timestamp
+    saved_sources = msg.get("sources", [])                  # retrieve stored list (empty = no sources)
 
     if msg["role"] == "user":
         col1, col2 = st.columns([3, 1])                     # User occupies the LEFT 75% of the screen
@@ -198,8 +189,16 @@ for msg in st.session_state["messages"]:                    # Loop over every pa
         with col2:
             with st.chat_message("assistant"):              # Avatar + bubble rendered in the right column
                 st.markdown(msg["content"])
+                
+                # Re-render source filenames saved at response time
+                if saved_sources:                                # only render if sources exist
+                    source_list = "\n".join(f"- 📄 {s}" for s in saved_sources)
+                    st.caption(f"**Sources:**\n{source_list}")  # same format as the live render
+
                 if ts:                                      # show timestamp below message
                     st.caption(f"🕐 {ts}")
+
+
 
 
 # ── Chat input box ────────────────────────────────────────────────────────────
@@ -242,7 +241,8 @@ if query:                                                  # Only execute when t
 
             response_placeholder = st.empty()                  # In-place container updated token-by-token
             full_response        = ""                          # Accumulator for the complete streamed reply
-
+            sources = []
+            
             # ══════════════════════════════════════════════════════════════════
             # BRANCH A — Clarification turn
             # The previous assistant message asked the user to reply Yes or No.
@@ -295,15 +295,12 @@ if query:                                                  # Only execute when t
 
                 response_placeholder.markdown(full_response)
 
-                logger.info(
-                    f"Clarification turn complete — awaiting_clarification={st.session_state['awaiting_clarification']}"
-                )
 
 
             # ══════════════════════════════════════════════════════════════════
             # BRANCH B — Normal RAG turn
             # Run full retrieval + LLM pipeline, then check whether STEP 4
-            # fired so we know whether to arm the clarification flag.
+            # execute so we know whether to arm the clarification flag.
             # ══════════════════════════════════════════════════════════════════
 
             else:
@@ -329,7 +326,11 @@ if query:                                                  # Only execute when t
 
                 # stream the LLM answer
                 with st.spinner("💬 Generating response..."):
-                    for token in run_rag_chain_stream(query, docs_with_scores):
+                    for token in run_rag_chain_stream(
+                        query, 
+                        docs_with_scores,
+                        chat_history=st.session_state["chat_history"]   # pass memory
+                    ):
                         full_response += token or ""
                         response_placeholder.markdown(full_response + "")
 
@@ -354,6 +355,18 @@ if query:                                                  # Only execute when t
                         source_list = "\n".join(f"- 📄 {s}" for s in sources)  # one bullet per file
                         st.caption(f"**Sources:**\n{source_list}")              # render below the answer
 
+                # ── Update LLM memory (only on clean RAG answers, not "not found") ────
+                # We only append to memory when the LLM actually found something useful.
+                # Clarification exchanges are intentionally excluded from memory to avoid
+                # polluting history with "Yes / No" noise.
+                if not full_response.strip().startswith(NOT_FOUND_TRIGGER):
+                    st.session_state["chat_history"].append(             # Append user turn
+                        {"role": "user", "content": query}
+                    )
+                    st.session_state["chat_history"].append(             # Append assistant turn
+                        {"role": "assistant", "content": full_response}
+                    )
+
                 # ── detect STEP 4 "not found" response ───────────────────
                 # If the primary prompt could not find relevant context it will
                 # open its reply with NOT_FOUND_TRIGGER.  We arm the flag so
@@ -375,6 +388,9 @@ if query:                                                  # Only execute when t
             assistant_ts = format_timestamp(datetime.now())
             st.caption(f"🕐 {assistant_ts}")
 
-            st.session_state["messages"].append(
-                {"role": "assistant", "content": full_response, "timestamp": assistant_ts}
-            )
+            st.session_state["messages"].append({
+                 "role": "assistant", 
+                 "content": full_response, 
+                 "timestamp": assistant_ts,
+                 "sources": sources,
+            })
