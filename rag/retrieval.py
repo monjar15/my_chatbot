@@ -14,7 +14,7 @@ TOP_N_RERANK    = 4
 
 # ── Module-level cache for cross-encoder ────────────────────────────────────
 
-_cross_encoder_cache: CrossEncoder | None = None  # Will hold the loaded cross-encoder after first call
+_cross_encoder_cache: CrossEncoder | None = None        # Will hold the loaded cross-encoder after first call
 
 
 def _get_cross_encoder() -> CrossEncoder:
@@ -23,10 +23,10 @@ def _get_cross_encoder() -> CrossEncoder:
 
     if _cross_encoder_cache is None:                    # Only load if not already cached
         print(f"[Retrieval] Loading cross-encoder '{RERANKER_MODEL}' ...")  # First-time load notification
-        _cross_encoder_cache = CrossEncoder(RERANKER_MODEL)   # Download/load the cross-encoder model
-        print(f"[Retrieval] ✅ Cross-encoder loaded.")          # Confirm load
+        _cross_encoder_cache = CrossEncoder(RERANKER_MODEL)                 # Download/load the cross-encoder model
+        print(f"[Retrieval] ✅ Cross-encoder loaded.")                      # Confirm load
 
-    return _cross_encoder_cache                         # Return the (possibly cached) model
+    return _cross_encoder_cache                                             # Return the (possibly cached) model
 
 
 # ── Stage 1: BM25 retriever ──────────────────────────────────────────────────

@@ -10,9 +10,10 @@ from rag.logger import logger                              # Shared logger insta
 
 LLM_MODEL   = "qwen3:1.7b"   # Ollama model tag – must be pulled: `ollama pull qwen3:8b`
                              # TIP: Use "qwen3:1.7b/no_think " to disable thinking mode for faster (but less reasoned) answers
-LLM_TEMP    = 0           # Low temperature → more deterministic, factual answers (0 = fully deterministic)
-LLM_TOKENS  = 1024          # Maximum number of tokens the LLM is allowed to generate per response
-
+LLM_TEMP    = 0              # Low temperature → more deterministic, factual answers (0 = fully deterministic)
+LLM_TOKENS  = 1024           # Maximum number of tokens the LLM is allowed to generate per response
+LLM_KEEP_ALIVE = "10m"       # Keep model loaded in VRAM between requests (reduces reload latency)
+                             # Use -1 to keep alive indefinitely, or "0" to unload immediately after use
 
 # ── LLM initialiser ──────────────────────────────────────────────────────────
 
@@ -21,14 +22,15 @@ def get_llm() -> ChatOllama:
     llm = ChatOllama(              
         model=LLM_MODEL,           
         temperature=LLM_TEMP,      
-        num_predict=LLM_TOKENS,    
+        num_predict=LLM_TOKENS,
+        keep_alive=LLM_KEEP_ALIVE,    
     )
 
     logger.info(                   # Record loaded LLM configuration
-        f"LLM → model='{LLM_MODEL}', temp={LLM_TEMP}, max_tokens={LLM_TOKENS}"
+        f"LLM → model='{LLM_MODEL}', temp={LLM_TEMP}, max_tokens={LLM_TOKENS}, keep_alive={LLM_KEEP_ALIVE}"
     )
 
-    print(f"[Chain] LLM → model='{LLM_MODEL}', temp={LLM_TEMP}, max_tokens={LLM_TOKENS}")  # Log LLM config
+    print(f"[Chain] LLM → model='{LLM_MODEL}', temp={LLM_TEMP}, max_tokens={LLM_TOKENS}, keep_alive={LLM_KEEP_ALIVE}")  # Log LLM config
 
     return llm                   
 

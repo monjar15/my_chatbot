@@ -1097,3 +1097,249 @@
 2026-06-26 22:24:10,085 | INFO | Stream complete (455 token(s))
 2026-06-26 22:24:10,097 | INFO | Generated response (707 chars)
 2026-06-26 22:24:10,105 | INFO | ================================================================================
+2026-06-28 22:00:04,010 | INFO | Chatbot application started
+2026-06-28 22:00:04,024 | INFO | First run detected — performing full index build
+2026-06-28 22:00:04,030 | INFO | Loaded 1 document(s)
+2026-06-28 22:00:04,041 | INFO | Cleaned 1 document(s)
+2026-06-28 22:00:04,052 | INFO | Generated 145 chunk(s)
+2026-06-28 22:02:01,753 | INFO | Stored 145 vectors in Qdrant
+2026-06-28 22:08:35,720 | INFO | User query: andres bonifacio
+2026-06-28 22:08:35,834 | INFO | Query received: andres bonifacio
+2026-06-28 22:08:35,910 | INFO | BM25 returned 10 documents
+2026-06-28 22:08:36,942 | INFO | Dense returned 10 documents
+2026-06-28 22:08:36,943 | INFO | Merged into 14 unique documents
+2026-06-28 22:09:04,944 | INFO | Returned 4 reranked document(s)
+2026-06-28 22:09:04,945 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-28 22:09:06,170 | INFO | Chunk 1 | Score=+0.9978 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-28 22:09:06,170 | INFO | Chunk 2 | Score=+0.8561 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-28 22:09:06,170 | INFO | Chunk 3 | Score=+0.8422 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-28 22:09:06,170 | INFO | Chunk 4 | Score=+0.7912 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-28 22:09:06,172 | INFO | Streaming RAG chain for: 'andres bonifacio' | history_turns=0
+2026-06-28 22:10:09,344 | INFO | Stream complete (403 token(s))
+2026-06-28 22:10:09,351 | INFO | Generated response (391 chars)
+2026-06-28 22:10:09,353 | INFO | ================================================================================
+2026-06-29 13:24:29,100 | INFO | Chatbot application started
+2026-06-29 13:24:29,121 | INFO | Incremental index: 1 new/modified file(s) detected
+2026-06-29 13:24:29,129 | INFO | Filtered to 1 new document object(s) from 1 total loaded
+2026-06-29 13:24:29,152 | INFO | Generated 145 new chunk(s)
+2026-06-29 13:26:41,438 | INFO | Added 145 new vectors to existing Qdrant collection
+2026-06-29 13:26:52,451 | INFO | User query: bonifacio
+2026-06-29 13:26:52,489 | INFO | Query received: bonifacio
+2026-06-29 13:26:52,517 | INFO | BM25 returned 10 documents
+2026-06-29 13:26:52,840 | INFO | Dense returned 10 documents
+2026-06-29 13:26:52,840 | INFO | Merged into 14 unique documents
+2026-06-29 13:27:16,625 | INFO | Returned 4 reranked document(s)
+2026-06-29 13:27:16,625 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-29 13:27:17,951 | INFO | Chunk 1 | Score=+0.7046 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 13:27:17,952 | INFO | Chunk 2 | Score=+0.7046 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 13:27:17,952 | INFO | Chunk 3 | Score=+0.5222 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 13:27:17,952 | INFO | Chunk 4 | Score=+0.4965 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 13:27:17,952 | INFO | Streaming RAG chain for: 'bonifacio' | history_turns=0
+2026-06-29 13:28:27,476 | INFO | Stream complete (383 token(s))
+2026-06-29 13:28:27,489 | INFO | Generated response (686 chars)
+2026-06-29 13:28:27,501 | INFO | ================================================================================
+2026-06-29 13:29:45,520 | INFO | New chat started — id=4b754ca7-60d6-4415-b60f-7f2512873395
+2026-06-29 13:29:53,816 | INFO | User query: ramon
+2026-06-29 13:29:53,878 | INFO | Query received: ramon
+2026-06-29 13:29:53,888 | INFO | BM25 returned 10 documents
+2026-06-29 13:29:56,627 | INFO | Dense returned 10 documents
+2026-06-29 13:29:56,630 | INFO | Merged into 14 unique documents
+2026-06-29 13:30:14,310 | INFO | Returned 4 reranked document(s)
+2026-06-29 13:30:14,314 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-29 13:30:16,410 | INFO | Chunk 1 | Score=+0.0099 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 13:30:16,412 | INFO | Chunk 2 | Score=+0.0099 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 13:30:16,413 | INFO | Chunk 3 | Score=+0.0022 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 13:30:16,414 | INFO | Chunk 4 | Score=+0.0022 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 13:30:16,421 | INFO | Streaming RAG chain for: 'ramon' | history_turns=0
+2026-06-29 13:31:22,534 | INFO | Stream complete (375 token(s))
+2026-06-29 13:31:22,542 | INFO | Generated response (174 chars)
+2026-06-29 13:31:22,544 | INFO | STEP 4 triggered — awaiting_clarification set to True
+2026-06-29 13:31:22,544 | INFO | ================================================================================
+2026-06-29 13:31:52,232 | INFO | User query: haha
+2026-06-29 13:31:52,237 | INFO | Clarification reply received: haha
+2026-06-29 13:31:52,271 | INFO | ================================================================================
+2026-06-29 13:32:00,917 | INFO | User query: huhu
+2026-06-29 13:32:00,923 | INFO | Clarification reply received: huhu
+2026-06-29 13:32:00,931 | INFO | ================================================================================
+2026-06-29 13:32:05,785 | INFO | User query: yes
+2026-06-29 13:32:05,789 | INFO | Clarification reply received: yes
+2026-06-29 13:32:05,793 | INFO | ================================================================================
+2026-06-29 13:32:13,053 | INFO | User query: haha
+2026-06-29 13:32:13,094 | INFO | Query received: haha
+2026-06-29 13:32:13,112 | INFO | BM25 returned 10 documents
+2026-06-29 13:32:16,213 | INFO | Dense returned 10 documents
+2026-06-29 13:32:16,216 | INFO | Merged into 14 unique documents
+2026-06-29 13:32:30,990 | INFO | Returned 4 reranked document(s)
+2026-06-29 13:32:30,993 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-29 13:32:32,561 | INFO | Chunk 1 | Score=+0.0009 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 13:32:32,561 | INFO | Chunk 2 | Score=+0.0009 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 13:32:32,561 | INFO | Chunk 3 | Score=+0.0005 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 13:32:32,562 | INFO | Chunk 4 | Score=+0.0005 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 13:32:32,569 | INFO | Streaming RAG chain for: 'haha' | history_turns=0
+2026-06-29 13:33:11,782 | INFO | Stream complete (212 token(s))
+2026-06-29 13:33:11,794 | INFO | Generated response (173 chars)
+2026-06-29 13:33:11,796 | INFO | STEP 4 triggered — awaiting_clarification set to True
+2026-06-29 13:33:11,796 | INFO | ================================================================================
+2026-06-29 13:33:18,451 | INFO | User query: no
+2026-06-29 13:33:18,456 | INFO | Clarification reply received: no
+2026-06-29 13:33:18,490 | INFO | ================================================================================
+2026-06-29 13:33:30,394 | INFO | User query: bonifacio
+2026-06-29 13:33:30,435 | INFO | Query received: bonifacio
+2026-06-29 13:33:30,452 | INFO | BM25 returned 10 documents
+2026-06-29 13:33:32,947 | INFO | Dense returned 10 documents
+2026-06-29 13:33:32,947 | INFO | Merged into 14 unique documents
+2026-06-29 13:33:50,175 | INFO | Returned 4 reranked document(s)
+2026-06-29 13:33:50,176 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-29 13:33:51,679 | INFO | Chunk 1 | Score=+0.7046 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 13:33:51,679 | INFO | Chunk 2 | Score=+0.7046 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 13:33:51,679 | INFO | Chunk 3 | Score=+0.5222 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 13:33:51,679 | INFO | Chunk 4 | Score=+0.4965 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 13:33:51,685 | INFO | Streaming RAG chain for: 'bonifacio' | history_turns=0
+2026-06-29 13:34:38,617 | INFO | Stream complete (430 token(s))
+2026-06-29 13:34:38,622 | INFO | Generated response (579 chars)
+2026-06-29 13:34:38,630 | INFO | ================================================================================
+2026-06-29 13:34:45,355 | INFO | New chat started — id=70fa42d7-4695-4dd9-a838-7d0a1a6c528b
+2026-06-29 13:34:53,803 | INFO | Switched to chat id=4b754ca7-60d6-4415-b60f-7f2512873395
+2026-06-29 13:34:56,900 | INFO | Switched to chat id=99121608-6c69-452e-994a-96e99d93bb87
+2026-06-29 13:35:02,490 | INFO | New chat started — id=b2932dd2-9a1c-4253-8d85-18d720679efc
+2026-06-29 15:38:39,862 | INFO | Chatbot application started
+2026-06-29 15:38:39,882 | INFO | Incremental index: 2 new/modified file(s) detected
+2026-06-29 15:38:39,890 | INFO | Filtered to 2 new document object(s) from 3 total loaded
+2026-06-29 15:38:39,912 | INFO | Generated 211 new chunk(s)
+2026-06-29 15:41:54,637 | INFO | Added 211 new vectors to existing Qdrant collection
+2026-06-29 15:43:43,698 | INFO | User query: bonifacio
+2026-06-29 15:43:43,847 | INFO | Query received: bonifacio
+2026-06-29 15:43:43,876 | INFO | BM25 returned 10 documents
+2026-06-29 15:43:44,659 | INFO | Dense returned 10 documents
+2026-06-29 15:43:44,660 | INFO | Merged into 14 unique documents
+2026-06-29 15:44:09,868 | INFO | Returned 4 reranked document(s)
+2026-06-29 15:44:09,873 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-29 15:44:11,418 | INFO | Chunk 1 | Score=+0.7046 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 15:44:11,419 | INFO | Chunk 2 | Score=+0.7046 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 15:44:11,419 | INFO | Chunk 3 | Score=+0.4965 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 15:44:11,419 | INFO | Chunk 4 | Score=+0.4965 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 15:44:11,419 | INFO | Streaming RAG chain for: 'bonifacio' | history_turns=0
+2026-06-29 15:45:21,230 | INFO | Stream complete (354 token(s))
+2026-06-29 15:45:21,236 | INFO | Generated response (494 chars)
+2026-06-29 15:45:21,242 | INFO | ================================================================================
+2026-06-29 15:45:34,910 | INFO | New chat started — id=5cb6880a-16ce-4e76-a329-f8a8cdd2f26c
+2026-06-29 15:45:40,488 | INFO | User query: mabini
+2026-06-29 15:45:40,564 | INFO | Query received: mabini
+2026-06-29 15:45:40,580 | INFO | BM25 returned 10 documents
+2026-06-29 15:45:44,497 | INFO | Dense returned 10 documents
+2026-06-29 15:45:44,497 | INFO | Merged into 14 unique documents
+2026-06-29 15:46:02,419 | INFO | Returned 4 reranked document(s)
+2026-06-29 15:46:02,420 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-29 15:46:04,032 | INFO | Chunk 1 | Score=+0.9868 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-29 15:46:04,032 | INFO | Chunk 2 | Score=+0.9289 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-29 15:46:04,032 | INFO | Chunk 3 | Score=+0.8709 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-29 15:46:04,032 | INFO | Chunk 4 | Score=+0.8358 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-29 15:46:04,039 | INFO | Streaming RAG chain for: 'mabini' | history_turns=0
+2026-06-29 15:47:10,297 | INFO | Stream complete (446 token(s))
+2026-06-29 15:47:10,307 | INFO | Generated response (903 chars)
+2026-06-29 15:47:10,319 | INFO | ================================================================================
+2026-06-29 15:47:30,598 | INFO | New chat started — id=47825777-5923-4b5c-bb00-b77258db74ca
+2026-06-29 15:47:37,371 | INFO | User query: emilio aguinaldo
+2026-06-29 15:47:37,421 | INFO | Query received: emilio aguinaldo
+2026-06-29 15:47:37,431 | INFO | BM25 returned 10 documents
+2026-06-29 15:47:40,250 | INFO | Dense returned 10 documents
+2026-06-29 15:47:40,251 | INFO | Merged into 14 unique documents
+2026-06-29 15:47:59,474 | INFO | Returned 4 reranked document(s)
+2026-06-29 15:47:59,477 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-29 15:48:01,223 | INFO | Chunk 1 | Score=+0.9996 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-29 15:48:01,223 | INFO | Chunk 2 | Score=+0.9908 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-29 15:48:01,224 | INFO | Chunk 3 | Score=+0.9908 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-29 15:48:01,224 | INFO | Chunk 4 | Score=+0.9849 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-29 15:48:01,235 | INFO | Streaming RAG chain for: 'emilio aguinaldo' | history_turns=0
+2026-06-29 15:49:04,239 | INFO | Stream complete (310 token(s))
+2026-06-29 15:49:04,252 | INFO | Generated response (414 chars)
+2026-06-29 15:49:04,263 | INFO | ================================================================================
+2026-06-29 15:50:50,565 | INFO | New chat started — id=06675c2a-96cb-465c-8d0a-f1536e96bb27
+2026-06-29 15:50:52,502 | INFO | Switched to chat id=47825777-5923-4b5c-bb00-b77258db74ca
+2026-06-29 15:50:53,788 | INFO | Switched to chat id=5cb6880a-16ce-4e76-a329-f8a8cdd2f26c
+2026-06-29 15:50:55,106 | INFO | Switched to chat id=0847c107-0b18-4db6-a4e5-ad990984bab1
+2026-06-29 15:50:57,104 | INFO | Switched to chat id=5cb6880a-16ce-4e76-a329-f8a8cdd2f26c
+2026-06-29 15:50:57,719 | INFO | Switched to chat id=47825777-5923-4b5c-bb00-b77258db74ca
+2026-06-29 15:50:59,265 | INFO | Switched to chat id=5cb6880a-16ce-4e76-a329-f8a8cdd2f26c
+2026-06-29 15:51:00,472 | INFO | Switched to chat id=0847c107-0b18-4db6-a4e5-ad990984bab1
+2026-06-29 15:51:02,464 | INFO | Switched to chat id=47825777-5923-4b5c-bb00-b77258db74ca
+2026-06-29 15:51:16,726 | INFO | User query: rizal
+2026-06-29 15:51:16,778 | INFO | Query received: rizal
+2026-06-29 15:51:16,794 | INFO | BM25 returned 10 documents
+2026-06-29 15:51:19,617 | INFO | Dense returned 10 documents
+2026-06-29 15:51:19,618 | INFO | Merged into 14 unique documents
+2026-06-29 15:51:41,310 | INFO | Returned 4 reranked document(s)
+2026-06-29 15:51:41,313 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-29 15:51:42,926 | INFO | Chunk 1 | Score=+0.9571 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 15:51:42,926 | INFO | Chunk 2 | Score=+0.9571 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 15:51:42,926 | INFO | Chunk 3 | Score=+0.2756 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 15:51:42,926 | INFO | Chunk 4 | Score=+0.2756 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 15:51:42,933 | INFO | Streaming RAG chain for: 'rizal' | history_turns=2
+2026-06-29 15:52:36,776 | INFO | Stream complete (276 token(s))
+2026-06-29 15:52:36,785 | INFO | Generated response (411 chars)
+2026-06-29 15:52:36,797 | INFO | ================================================================================
+2026-06-29 15:53:52,951 | INFO | New chat started — id=8bee43b8-846f-4afb-b212-d5f91cfacbf0
+2026-06-29 16:04:01,677 | INFO | Chatbot application started
+2026-06-29 16:04:01,698 | INFO | No file changes detected — loading existing index from disk
+2026-06-29 16:04:15,300 | INFO | Loaded existing index (501 chunk(s))
+2026-06-29 16:04:33,993 | INFO | User query: who is emilio aguinaldo?
+2026-06-29 16:04:34,047 | INFO | Query received: who is emilio aguinaldo?
+2026-06-29 16:04:34,080 | INFO | BM25 returned 10 documents
+2026-06-29 16:04:34,374 | INFO | Dense returned 10 documents
+2026-06-29 16:04:34,374 | INFO | Merged into 14 unique documents
+2026-06-29 16:04:59,728 | INFO | Returned 4 reranked document(s)
+2026-06-29 16:04:59,728 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-29 16:05:01,136 | INFO | Chunk 1 | Score=+0.9996 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-29 16:05:01,137 | INFO | Chunk 2 | Score=+0.9825 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-29 16:05:01,137 | INFO | Chunk 3 | Score=+0.9547 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-29 16:05:01,137 | INFO | Chunk 4 | Score=+0.9423 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-29 16:05:01,137 | INFO | Streaming RAG chain for: 'who is emilio aguinaldo?' | history_turns=0
+2026-06-29 16:06:11,288 | INFO | Stream complete (420 token(s))
+2026-06-29 16:06:11,318 | INFO | Generated response (752 chars)
+2026-06-29 16:06:11,335 | INFO | ================================================================================
+2026-06-29 16:06:34,216 | INFO | User query: who is andres bonifacio?
+2026-06-29 16:06:34,288 | INFO | Query received: who is andres bonifacio?
+2026-06-29 16:06:34,304 | INFO | BM25 returned 10 documents
+2026-06-29 16:06:36,972 | INFO | Dense returned 10 documents
+2026-06-29 16:06:36,973 | INFO | Merged into 14 unique documents
+2026-06-29 16:06:53,882 | INFO | Returned 4 reranked document(s)
+2026-06-29 16:06:53,882 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-29 16:06:55,300 | INFO | Chunk 1 | Score=+0.9995 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 16:06:55,301 | INFO | Chunk 2 | Score=+0.9995 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 16:06:55,301 | INFO | Chunk 3 | Score=+0.7427 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 16:06:55,302 | INFO | Chunk 4 | Score=+0.7427 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 16:06:55,304 | INFO | Streaming RAG chain for: 'who is andres bonifacio?' | history_turns=2
+2026-06-29 16:08:20,275 | INFO | Stream complete (485 token(s))
+2026-06-29 16:08:20,281 | INFO | Generated response (747 chars)
+2026-06-29 16:08:20,289 | INFO | ================================================================================
+2026-06-29 16:09:15,403 | INFO | User query: when is his death?
+2026-06-29 16:09:15,465 | INFO | Query received: when is his death?
+2026-06-29 16:09:15,478 | INFO | BM25 returned 10 documents
+2026-06-29 16:09:17,949 | INFO | Dense returned 10 documents
+2026-06-29 16:09:17,950 | INFO | Merged into 14 unique documents
+2026-06-29 16:09:35,245 | INFO | Returned 4 reranked document(s)
+2026-06-29 16:09:35,246 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-29 16:09:36,631 | INFO | Chunk 1 | Score=+0.3931 | Source=Emilio Aguinaldo - Wikipedia.md
+2026-06-29 16:09:36,632 | INFO | Chunk 2 | Score=+0.3811 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 16:09:36,632 | INFO | Chunk 3 | Score=+0.3811 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 16:09:36,633 | INFO | Chunk 4 | Score=+0.3779 | Source=Apolinario Mabini - Wikipedia.md
+2026-06-29 16:09:36,642 | INFO | Streaming RAG chain for: 'when is his death?' | history_turns=4
+2026-06-29 16:10:29,777 | INFO | Stream complete (220 token(s))
+2026-06-29 16:10:29,791 | INFO | Generated response (78 chars)
+2026-06-29 16:10:29,800 | INFO | ================================================================================
+2026-06-29 16:11:43,072 | INFO | User query: when does andres bonifacio died?
+2026-06-29 16:11:43,132 | INFO | Query received: when does andres bonifacio died?
+2026-06-29 16:11:43,147 | INFO | BM25 returned 10 documents
+2026-06-29 16:11:45,812 | INFO | Dense returned 10 documents
+2026-06-29 16:11:45,812 | INFO | Merged into 14 unique documents
+2026-06-29 16:12:02,842 | INFO | Returned 4 reranked document(s)
+2026-06-29 16:12:02,842 | INFO | Retrieved 4 reranked chunk(s)
+2026-06-29 16:12:04,299 | INFO | Chunk 1 | Score=+0.9972 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 16:12:04,299 | INFO | Chunk 2 | Score=+0.9972 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 16:12:04,299 | INFO | Chunk 3 | Score=+0.9936 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 16:12:04,299 | INFO | Chunk 4 | Score=+0.9936 | Source=Andrés Bonifacio - Wikipedia.md
+2026-06-29 16:12:04,306 | INFO | Streaming RAG chain for: 'when does andres bonifacio died?' | history_turns=6
+2026-06-29 16:12:54,572 | INFO | Stream complete (161 token(s))
+2026-06-29 16:12:54,581 | INFO | Generated response (40 chars)
+2026-06-29 16:12:54,586 | INFO | ================================================================================
+2026-06-29 16:13:06,173 | INFO | New chat started — id=80067c46-3966-4244-b5c3-52405975e887

@@ -30,3 +30,12 @@ version 0.2	improvement
 		Remove the "Chunks Information" box
 		Fixed the "source file" not visible in
 				assistant response history
+version 0.3	improvement
+		Added "New Chat" functionality
+		Added "Recent Chat" functionality
+		Transfer "Index Documents" functionality
+				inside the program. It also
+				detects if there are new documents
+				in the repository and create vector
+				for it (incremental creation)
+		Added "Keep Alive" in the LLM operation

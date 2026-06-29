@@ -1,4 +1,5 @@
 import os                                              
+import json
 import pickle                                 # Standard library: serialize Python objects to disk
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter  
@@ -14,6 +15,7 @@ from qdrant_client.models import Distance, VectorParams            # Config obje
 COLLECTION_NAME   = "rag_documents"       # Name of Qdrant collection that stores our vectors
 QDRANT_PATH       = "./qdrant_storage"  
 CHUNKS_CACHE_PATH = "./chunks_cache.pkl"  # Pickle file that caches split chunks for BM25 retriever re-use
+RECORDER_PATH     = "./indexed_recorder.json" # JSON file tracking which files have been indexed + their mtimes
 EMBEDDING_MODEL   = "BAAI/bge-m3"         
 CHUNK_SIZE        = 768                   
 CHUNK_OVERLAP     = 100                   
@@ -56,9 +58,31 @@ def split_documents(docs: list[Document]) -> list[Document]:
     return chunks                                    
 
 
-# ── Build / index vector store ───────────────────────────────────────────────
+# ── Indexed Recorder helper functions ─────────────────────────────────────────
 
-def build_vectorstore(chunks: list[Document]) -> QdrantVectorStore:
+def load_recorder() -> dict:
+
+    if not os.path.exists(RECORDER_PATH):
+        return {}                                      # First run — nothing indexed yet
+
+    with open(RECORDER_PATH, "r", encoding="utf-8") as f:
+        recorder = json.load(f)
+
+    print(f"[Embedding] Loaded recorder: {len(recorder)} file(s) previously indexed")
+
+    return recorder
+
+def save_recorder(recorder: dict) -> None:
+
+    with open(RECORDER_PATH, "w", encoding="utf-8") as f:
+        json.dump(recorder, f, indent=2)
+
+    print(f"[Embedding] ✅ Recorder saved: {len(recorder)} file(s) recorded")
+
+
+# ── Build / index vector store (FULL — first run) ───────────────────────────
+
+def build_vectorstore(chunks: list[Document], recorder: dict | None = None) -> QdrantVectorStore:
  
     embeddings = get_embedding_model()               
 
@@ -66,7 +90,7 @@ def build_vectorstore(chunks: list[Document]) -> QdrantVectorStore:
 
     client = QdrantClient(path=QDRANT_PATH)          # Open a Qdrant client
 
-    # ── Recreate collection ──
+    # ── Drop old collection if one exists ──
     existing_names = [                               # Get the names of all collections that already exist
         c.name                                       # .name is the string identifier of each collection
         for c in client.get_collections().collections  # .collections is a list of CollectionDescription objects
@@ -92,7 +116,7 @@ def build_vectorstore(chunks: list[Document]) -> QdrantVectorStore:
         embedding=embeddings                         # The embedding model used to encode documents and queries
     )
 
-    print(f"[Embedding] Embedding {len(chunks)} chunks and inserting into Qdrant ...")  # Warn user this may take time
+    print(f"[Embedding] Embedding {len(chunks)} chunk(s) — this may take a few minutes ...")  # Warn user this may take time
     vectorstore.add_documents(chunks)                # Encode every chunk and upsert the vectors into Qdrant
     print(f"[Embedding] ✅ Stored {len(chunks)} chunks in Qdrant at '{QDRANT_PATH}'")   # Confirm storage
 
@@ -101,7 +125,52 @@ def build_vectorstore(chunks: list[Document]) -> QdrantVectorStore:
         pickle.dump(chunks, f)                       # Serialise the chunks list to disk
     print(f"[Embedding] ✅ Chunk cache saved to '{CHUNKS_CACHE_PATH}'")  # Confirm cache write
 
+    # ── Save recorder so the next startup knows what is indexed ──
+    if recorder is not None:
+        save_recorder(recorder)
+
     return vectorstore                              
+
+
+# ── Add new chunks to existing vector store (INCREMENTAL) ───────────────────
+
+def add_documents_incremental(
+    new_chunks: list[Document],
+    updated_recorder: dict
+) -> QdrantVectorStore:
+
+    embeddings = get_embedding_model()
+
+    client = QdrantClient(path=QDRANT_PATH)            # Open existing storage
+
+    vectorstore = QdrantVectorStore(
+        client=client,
+        collection_name=COLLECTION_NAME,
+        embedding=embeddings
+    )
+
+    print(f"[Embedding] Appending {len(new_chunks)} new chunk(s) to existing collection ...")
+    vectorstore.add_documents(new_chunks)              # Upsert only the new vectors
+    print(f"[Embedding] ✅ Added {len(new_chunks)} new chunk(s) to Qdrant")
+
+    # ── Merge new chunks into the existing BM25 cache ──
+    existing_chunks: list[Document] = []
+
+    if os.path.exists(CHUNKS_CACHE_PATH):
+        with open(CHUNKS_CACHE_PATH, "rb") as f:
+            existing_chunks = pickle.load(f)
+        print(f"[Embedding] Loaded {len(existing_chunks)} existing chunk(s) from cache")
+
+    all_chunks = existing_chunks + new_chunks
+
+    with open(CHUNKS_CACHE_PATH, "wb") as f:
+        pickle.dump(all_chunks, f)
+    print(f"[Embedding] ✅ Chunk cache updated: {len(all_chunks)} total chunk(s)")
+
+    # ── Save the updated recorder ──
+    save_recorder(updated_recorder)
+
+    return vectorstore
 
 
 # ── Load existing vector store ───────────────────────────────────────────────
