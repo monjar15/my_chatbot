@@ -1,6 +1,7 @@
 import os                                              
 import json
 import pickle                                 # Standard library: serialize Python objects to disk
+import streamlit as st
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter  
 from langchain_core.documents import Document                      # LangChain's Document wrapper
@@ -17,13 +18,14 @@ QDRANT_PATH       = "./qdrant_storage"
 CHUNKS_CACHE_PATH = "./chunks_cache.pkl"  # Pickle file that caches split chunks for BM25 retriever re-use
 RECORDER_PATH     = "./indexed_recorder.json" # JSON file tracking which files have been indexed + their mtimes
 EMBEDDING_MODEL   = "BAAI/bge-m3"         
-CHUNK_SIZE        = 768                   
+CHUNK_SIZE        = 1024                   
 CHUNK_OVERLAP     = 100                   
 VECTOR_DIM        = 1024                  
 
 
 # ── Embedding model loader ───────────────────────────────────────────────────
 
+@st.cache_resource(show_spinner=False)
 def get_embedding_model() -> HuggingFaceEmbeddings:
 
     print(f"[Embedding] Loading embedding model '{EMBEDDING_MODEL}' ...")  
@@ -175,6 +177,7 @@ def add_documents_incremental(
 
 # ── Load existing vector store ───────────────────────────────────────────────
 
+@st.cache_resource(show_spinner=False)
 def load_vectorstore() -> QdrantVectorStore:
 
     if not os.path.exists(QDRANT_PATH):              # Check that the storage folder is present

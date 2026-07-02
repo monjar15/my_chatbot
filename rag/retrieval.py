@@ -3,13 +3,29 @@ from langchain_core.documents import Document               # LangChain's Docume
 from langchain_qdrant import QdrantVectorStore              
 from sentence_transformers import CrossEncoder              
 from rag.logger import logger                               # Import shared logger
-
+import streamlit as st
+import re                                                   # For enumeration-query pattern detection
 
 # ── Configuration constants ──────────────────────────────────────────────────
 
-RERANKER_MODEL  = "BAAI/bge-reranker-v2-m3"  
-TOP_K_RETRIEVE  = 10                           
-TOP_N_RERANK    = 4                            
+RERANKER_MODEL  = "BAAI/bge-reranker-v2-m3"
+TOP_K_RETRIEVE_NARROW = 10                      # Default candidate pool for single-fact queries — fast path
+TOP_N_RERANK_NARROW   = 4                       # Default rerank count for single-fact queries — fast path
+TOP_K_RETRIEVE_WIDE   = 20                      # Widened candidate pool for enumeration-style queries (e.g.
+                                                # "who are all the X") so every distinct entity has a chance
+                                                # to enter reranking                            
+TOP_N_RERANK_WIDE     = 15                      # Widened rerank count so multi-entity answers aren't cut off
+
+# ── Patterns that signal a "list everything" style question rather than ──
+# ── a single-fact lookup — only these get the slower, wider retrieval path ──
+_ENUMERATION_PATTERNS = re.compile(
+    r"\b(who are|what are|list|all the|every|each of|name the|which (ladies|people|persons|women|men|items))\b",
+    re.IGNORECASE
+)
+
+
+def _is_enumeration_query(query: str) -> bool:
+    return bool(_ENUMERATION_PATTERNS.search(query))
 
 
 # ── Module-level cache for cross-encoder ────────────────────────────────────
@@ -31,19 +47,20 @@ def _get_cross_encoder() -> CrossEncoder:
 
 # ── Stage 1: BM25 retriever ──────────────────────────────────────────────────
 
+@st.cache_resource(show_spinner=False)
 def get_bm25_retriever(chunks: list[Document]) -> BM25Retriever:
 
     retriever = BM25Retriever.from_documents(chunks)   # Build the BM25 index by tokenising every chunk's page_content
-    retriever.k = TOP_K_RETRIEVE                       
+    retriever.k = TOP_K_RETRIEVE_NARROW                       
 
-    print(f"[Retrieval] BM25 index built from {len(chunks)} chunks (top-k={TOP_K_RETRIEVE})")  # Log setup
+    print(f"[Retrieval] BM25 index built from {len(chunks)} chunks (top-k={TOP_K_RETRIEVE_NARROW})")  # Log setup
 
     return retriever                                   
 
 
 # ── Stage 2: Dense retriever ─────────────────────────────────────────────────
 
-def get_dense_retriever(vectorstore: QdrantVectorStore, k: int = TOP_K_RETRIEVE):
+def get_dense_retriever(vectorstore: QdrantVectorStore, k: int = TOP_K_RETRIEVE_NARROW):
 
     retriever = vectorstore.as_retriever(              
         search_type="similarity",                      
@@ -71,7 +88,17 @@ def _merge_results(bm25_docs: list[Document], dense_docs: list[Document]) -> lis
     dense_slice = dense_docs[:dense_limit]            # Take only the top 80% from dense
 
     # Concatenate dense first so semantic results lead, followed by BM25 keyword results
-    merged: list[Document] = dense_slice + bm25_slice # Dense first to prioritize semantic results
+    combined: list[Document] = dense_slice + bm25_slice   # Dense first to prioritize semantic results
+
+    # ── Deduplicate by page_content so the same chunk from both sources ──
+    # ── doesn't consume two slots in the final reranked top_n ──
+    seen: set[str] = set()
+    merged: list[Document] = []
+    for doc in combined:
+        key = doc.page_content.strip()
+        if key not in seen:
+            seen.add(key)
+            merged.append(doc)
 
     return merged                                     # Return the weighted merged list
 
@@ -81,7 +108,7 @@ def _merge_results(bm25_docs: list[Document], dense_docs: list[Document]) -> lis
 def rerank_documents(
     query: str,
     docs: list[Document],
-    top_n: int = TOP_N_RERANK
+    top_n: int = TOP_K_RETRIEVE_NARROW
 ) -> list[tuple[Document, float]]:
 
     cross_encoder = _get_cross_encoder()               # Load (or retrieve cached) cross-encoder model
@@ -120,16 +147,26 @@ def retrieve(
         f"Query received: {query}"
     )
 
+    # ── Decide retrieval width based on query type ──────────────────────────
+    is_enum = _is_enumeration_query(query)
+    top_k   = TOP_K_RETRIEVE_WIDE if is_enum else TOP_K_RETRIEVE_NARROW
+    top_n   = TOP_N_RERANK_WIDE   if is_enum else TOP_N_RERANK_NARROW
+
+    logger.info(
+        f"Query type: {'enumeration (wide)' if is_enum else 'narrow'} | top_k={top_k}, top_n={top_n}"
+    )
+
     print(f"[Retrieval] Query: '{query}'")                              # Echo the query for debugging
 
     # ── Stage 1 & 2: Run both retrievers ─────────────────────────────────────
+    bm25_retriever.k = top_k                                            # Adjust BM25 k per query type
     bm25_docs  = bm25_retriever.invoke(query)                           # BM25 keyword search
 
     logger.info(                                                        # Record BM25 retrieval count
         f"BM25 returned {len(bm25_docs)} documents"
     )
 
-    dense_docs = dense_retriever.invoke(query)                          # Dense vector search
+    dense_docs = dense_retriever.invoke(query, k=top_k)                 # Dense vector search
 
     logger.info(                                                        # Record dense retrieval count
         f"Dense returned {len(dense_docs)} documents"
@@ -148,7 +185,7 @@ def retrieve(
     print(f"[Retrieval] After merge: {len(merged)} unique doc(s)")      # Log merged count
 
     # ── Stage 4: Cross-encoder re-ranking ────────────────────────────────────
-    ranked = rerank_documents(query, merged, TOP_N_RERANK)               # Score and sort all candidates
+    ranked = rerank_documents(query, merged, top_n)                     # Score and sort all candidates
 
     logger.info(                                                        # Record reranking results
         f"Returned {len(ranked)} reranked document(s)"                  # Final reranked document count

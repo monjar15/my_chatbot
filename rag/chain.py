@@ -1,5 +1,6 @@
+import re                                                   # For stripping any stray <think> blocks from LLM output
 from langchain_ollama import ChatOllama                    
-from langchain_core.documents import Document                      # LangChain Document (page_content + metadata)
+from langchain_core.documents import Document               # LangChain Document (page_content + metadata)
 from langchain_core.prompts import ChatPromptTemplate      # Template that formats messages for the LLM
 from langchain_core.output_parsers import StrOutputParser  # Parses LLM ChatMessage output to a plain string
 from typing import Generator                               # Type hint for generator functions (streaming)
@@ -8,12 +9,14 @@ from rag.logger import logger                              # Shared logger insta
 
 # ── Configuration constants ──────────────────────────────────────────────────
 
-LLM_MODEL   = "qwen3:1.7b"   # Ollama model tag – must be pulled: `ollama pull qwen3:8b`
-                             # TIP: Use "qwen3:1.7b/no_think " to disable thinking mode for faster (but less reasoned) answers
+LLM_MODEL   = "qwen3:1.7b"   # TIP: Use "qwen3:1.7b/no_think " to disable thinking mode for faster (but less reasoned) answers
 LLM_TEMP    = 0              # Low temperature → more deterministic, factual answers (0 = fully deterministic)
-LLM_TOKENS  = 1024           # Maximum number of tokens the LLM is allowed to generate per response
-LLM_KEEP_ALIVE = "10m"       # Keep model loaded in VRAM between requests (reduces reload latency)
+LLM_TOKENS  = 4608           # Maximum number of tokens the LLM is allowed to generate per response
+LLM_KEEP_ALIVE = "30m"       # Keep model loaded in VRAM between requests (reduces reload latency)
                              # Use -1 to keep alive indefinitely, or "0" to unload immediately after use
+LLM_NUM_CTX = 16384          # Cap context window — measure your actual prompt size (context + history + question)
+                             # and set this just above it; avoid leaving it unset (defaults can be larger than needed)
+LLM_SEED = 42                # Fixed seed → combined with temperature=0, removes run-to-run sampling variance
 
 # ── LLM initialiser ──────────────────────────────────────────────────────────
 
@@ -23,7 +26,9 @@ def get_llm() -> ChatOllama:
         model=LLM_MODEL,           
         temperature=LLM_TEMP,      
         num_predict=LLM_TOKENS,
-        keep_alive=LLM_KEEP_ALIVE,    
+        keep_alive=LLM_KEEP_ALIVE,
+        num_ctx=LLM_NUM_CTX,
+        seed=LLM_SEED,    
     )
 
     logger.info(                   # Record loaded LLM configuration
@@ -41,11 +46,11 @@ def _build_prompt() -> ChatPromptTemplate:
 
     template = """\
 You are a professional internal company assistant. \
-Your sole knowledge source is the CONTEXT section below, \
+Your sole knowledge source is the documents section below, \
 which contains retrieved excerpts from official company documents.
 
 ──────────────────────────────────────────
-CONTEXT:
+DOCUMENTS:
 {context}
 ──────────────────────────────────────────
 
@@ -59,7 +64,7 @@ QUESTION: {question}
 ──────────────────────────────────────────
 INSTRUCTIONS — follow in this exact order:
 
-STEP 1 — SEARCH: Carefully read every sentence in the CONTEXT above \
+STEP 1 — SEARCH: Carefully read every sentence in the documents above \
 and identify all passages that are relevant to the QUESTION. \
 You may use the CHAT HISTORY to understand follow-up questions \
 (e.g. resolving pronouns like "it", "that", "they", "him", "her", "he", or "she"), \
@@ -67,13 +72,18 @@ but NEVER use history as a knowledge source.
 
 STEP 2 — ANSWER: If relevant information is found, construct a clear, \
 concise, and professional answer using ONLY those passages. \
-Do not add any information that is not explicitly stated in the CONTEXT. \
+Do not add any information that is not explicitly stated in the documents. \
 Do not infer, assume, or speculate beyond what is written.
 
 STEP 3 — FORMAT: Use bullet points only when listing multiple distinct items. \
-Otherwise, respond in short, direct paragraphs.
+Otherwise, respond in short, direct paragraphs. \
+Answer as a knowledgeable assistant speaking in your own words — never use the \
+words "chunks", "passages", "excerpts", or any other retrieval-related term \
+when phrasing your answer. \
+Do not say things like "According to the provided chunks/reference" or "Based on the \
+passages above" — just state the information directly as fact.
 
-STEP 4 — NOT FOUND: Only if the CONTEXT contains absolutely no information \
+STEP 4 — NOT FOUND: Only if the documents contains absolutely no information \
 relevant to the QUESTION — after carefully completing STEP 1 — \
 respond with exactly this message and nothing else (preserve the exact wording \
 but fill in the bracketed placeholder):
@@ -84,9 +94,9 @@ Please reply with **Yes** if you'd like to retype it, or **No** if the query was
 
 CRITICAL RULES:
 - You must complete STEP 1 before concluding that information is absent.
-- Never use knowledge from outside the CONTEXT.
+- Never use knowledge from outside the documents.
 - Never fabricate names, figures, policies, or procedures.
-- Never say "I wasn't able to find..." if the CONTEXT contains a relevant \
+- Never say "I wasn't able to find..." if the documents contains a relevant \
   passage, even if the passage only partially addresses the question.
 - Never add follow-up suggestions or escalation advice in this step — \
   that is handled separately if the user confirms the query is correct.
@@ -113,11 +123,77 @@ def _format_context(docs_with_scores: list[tuple[Document, float]]) -> str:
         )
 
         parts.append(                                  # Build a clearly delimited chunk block
-            f"[Chunk {i} | Relevance Score: {score:+.4f} | Source: {source}]\n"  # Header with rank, score, source
+            f"[Reference {i} | Source: {source}]\n"    # Header source
             f"{doc.page_content}"                      # The actual text content of the chunk
         )
 
     return "\n\n---\n\n".join(parts)                   # Join chunks with a visible separator for clarity
+
+
+# ── Query rewriting (resolve pronouns/follow-ups before retrieval) ───────────
+
+def rewrite_query_with_history(
+    query: str,
+    chat_history: list[dict] | None = None,
+    max_history_turns: int = 2                           # Keep this short — only need enough context to resolve references
+) -> str:
+
+    if not chat_history:                                 # No history yet → nothing to resolve, return as-is
+        return query
+
+    llm = get_llm()                                      # Reuse the same LLM instance
+
+    recent = chat_history[-(max_history_turns * 2):]     # Slice to a few recent turns only
+    history_lines = []
+    for msg in recent:
+        role_label = "User" if msg["role"] == "user" else "Assistant"
+        history_lines.append(f"{role_label}: {msg['content']}")
+    history_str = "\n".join(history_lines)
+
+    rewrite_prompt = f"""\
+Given the CHAT HISTORY below, rewrite the FOLLOW-UP QUESTION into a fully \
+standalone question that contains no pronouns or ambiguous references. \
+Replace words like "he", "she", "it", "they", "that", "this" with the \
+specific name or subject they refer to.
+
+IMPORTANT: Pronouns almost always refer to the subject of the MOST RECENT \
+exchange (the last User/Assistant pair) in the CHAT HISTORY below — NOT the \
+subject of earlier exchanges. Only fall back to an earlier subject if the \
+most recent exchange clearly does not introduce a person/subject that fits \
+the pronoun.
+
+If the FOLLOW-UP QUESTION is already standalone, return it unchanged. \
+Respond with ONLY the rewritten question and nothing else — no explanation, \
+no quotation marks, no preamble.
+
+CHAT HISTORY (oldest → newest; the LAST exchange is the most relevant one):
+{history_str}
+
+MOST RECENT SUBJECT HINT: the last User/Assistant exchange above is what \
+"he/she/it/they/that/this" in the FOLLOW-UP QUESTION most likely refers to.
+
+FOLLOW-UP QUESTION: {query}
+
+REWRITTEN QUESTION:"""
+
+    raw_output = str(llm.invoke(rewrite_prompt).content).strip()  # Single blocking call — fast since no_think + short output
+
+    # ── Defensive cleanup: strip any <think>...</think> block in case thinking mode still fired ──
+    if "<think>" in raw_output:
+        raw_output = re.sub(r"<think>.*?</think>", "", raw_output, flags=re.DOTALL).strip()
+        logger.warning(
+            f"Rewrite output contained a <think> block — stripped before use. Raw length was {len(raw_output)} chars after cleanup"
+        )
+
+    rewritten = raw_output
+
+    logger.info(
+        f"Query rewrite: '{query}' → '{rewritten}'"
+    )
+
+    print(f"[Chain] Query rewrite: '{query}' → '{rewritten}'")  # Log rewrite for debugging
+
+    return rewritten if rewritten else query             # Fallback to original if rewrite came back empty
 
 
 # ── Streaming RAG call ────────────────────────────────────────────────────────
@@ -126,7 +202,7 @@ def run_rag_chain_stream(
     query: str,
     docs_with_scores: list[tuple[Document, float]],
     chat_history: list[dict] | None = None,            # list of {"role": .., "content": ..} dicts
-    max_history_turns: int = 5                         # how many past exchanges to include
+    max_history_turns: int = 4                         # how many past exchanges to include
 ) -> Generator[str, None, None]:
 
     llm     = get_llm()                                # Initialise the LLM
@@ -157,13 +233,57 @@ def run_rag_chain_stream(
 
     token_count = 0                                    # Counter to track total streamed tokens
 
+    # ── Thinking-mode filter state ──
+    # Qwen3 emits <think>...</think> before its real answer when thinking mode
+    # is on. We must not let raw reasoning leak onto the user's screen, but the
+    # tags can arrive split across separate stream chunks (e.g. "<th" + "ink>"),
+    # so we buffer and only release text once we're sure it isn't part of a tag.
+    OPEN_TAG, CLOSE_TAG = "<think>", "</think>"
+    in_think = False                                    # True while inside a <think>...</think> block
+    buffer   = ""                                       # Holds text not yet safe to release
+
+    def _partial_suffix_len(s: str, tag: str) -> int:
+        # Longest suffix of s that could be the start of `tag` (so we can hold it back)
+        for n in range(min(len(s), len(tag) - 1), 0, -1):
+            if s.endswith(tag[:n]):
+                return n
+        return 0
+
     for token in chain.stream({                        # .stream() yields partial text chunks instead of blocking
         "context":  context,                           # Formatted retrieved passages
-        "question": query,                              # User's question
+        "question": f"{query}",                        # User's question
         "chat_history": history_str,                   # pass formatted history to prompt
     }):
         token_count += 1                               # Increment token counter
         yield token                                    # Yield the current token to the Streamlit caller
+
+        while True:
+            if not in_think:
+                if OPEN_TAG in buffer:                                   # Full opening tag found
+                    pre, buffer = buffer.split(OPEN_TAG, 1)
+                    if pre:
+                        yield pre                                        # Release text before the tag
+                    in_think = True
+                    continue
+                hold = _partial_suffix_len(buffer, OPEN_TAG)             # Might be a partial "<think>" at the tail
+                safe = buffer[: len(buffer) - hold] if hold else buffer
+                if safe:
+                    yield safe                                           # Safe to show
+                    buffer = buffer[len(safe):]
+                break
+            else:
+                if CLOSE_TAG in buffer:                                  # Full closing tag found
+                    _, buffer = buffer.split(CLOSE_TAG, 1)
+                    in_think = False
+                    continue
+                hold = _partial_suffix_len(buffer, CLOSE_TAG)            # Might be a partial "</think>" at the tail
+                buffer = buffer[len(buffer) - hold:] if hold else ""     # Discard reasoning text, keep only the hold-back
+                break
+
+    if buffer and not in_think:                        # Flush any trailing safe text after the stream ends
+        yield buffer
+    elif buffer and in_think:                           # Model never closed its <think> block (e.g. hit LLM_TOKENS cap)
+        logger.warning("Stream ended while still inside a <think> block — reasoning was truncated and discarded")
 
     logger.info(                                       # Record stream completion
         f"Stream complete ({token_count} token(s))"

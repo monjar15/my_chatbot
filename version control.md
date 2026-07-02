@@ -24,7 +24,7 @@ version 0.1	improvement
 	      		error.
 version 0.2	improvement
 		Added Memory chat
-		Remove "load Indxed" button
+		Remove "load Indxed" button and
 				incorporate the indexed loading
 				upon streamlit execution
 		Remove the "Chunks Information" box
@@ -39,3 +39,37 @@ version 0.3	improvement
 				in the repository and create vector
 				for it (incremental creation)
 		Added "Keep Alive" in the LLM operation
+version 0.4	impprovement
+		Added rewriter for memory chat
+		Added "Clear Chat" functionality
+		Improved the user interface
+		Added branding and tag line
+		Remove the welcome message upon
+				submission of first query
+		Disabled the new and clear chat buttons
+				upon generating the assistant
+				response
+		Disabled the recent chat buttons upon 
+				generating the assistant response
+		Disabled the input box upon generating the 
+				assistant response
+		Improved the promt by removing the "chunks"
+				on the assistant response
+		Improved the promt by replacing the "CONTEXT"
+				by "documents" on the assistant
+				response
+		Trasferred the time stamp on the right side
+				of the bubble (user and assistant)
+		Improved the apperance of input box
+		Improved the chat conversation display
+		Improved the apperance of the apperance of
+				new, clear, and recent chat buttons
+		Fixed the horizontal size of the side bar
+		Interchanged the position of the user and
+				assistant in the conversation area
+		Improved the appearance of conversation
+				display, user and assistant occupy
+				only 75% of the display screen.
+		Changed the Welcome message
+		Changed the message in the input box 		
+		
