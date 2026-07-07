@@ -71,5 +71,26 @@ version 0.4	impprovement
 				display, user and assistant occupy
 				only 75% of the display screen.
 		Changed the Welcome message
-		Changed the message in the input box 		
+		Changed the message in the input box
+version 0.5	impprovement
+		Improved clean_text() regex logic (preserves 
+				paragraph breaks, case-insensitive 
+				page-number matching); replaced print() 
+				with proper logger; added empty-document 
+				filtering in clean_documents().
+		Improved the logger.py (Fixed UTF-8 
+				encoding crash in logger; added log rotation 
+				(5MB, 3 backups); improved log format and 
+				cleaned up code structure.) Migrated deprecated 
+				st.components.v1.html to st.iframe in copy 
+				button component.
+		Resolved the command line errors and warnings
+				related to logger
+		Changed the Page title	
+		Added search functionality in recent chat
+		Added stop button functionality
+		Added action buttons (copy, like, dislike, 
+				and regenerate)
+		Removed the dead code, optimized the redundant code.
+		Improved the prompt and added 
 		

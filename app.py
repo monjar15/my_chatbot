@@ -5,6 +5,9 @@ import uuid                                            # for generating unique c
 import html
 import re
 import textwrap
+import json                                            # for safely escaping text into a JS string literal
+import csv
+from pathlib import Path
 
 # ── Import our custom RAG modules ────────────────────────────────────────────
 from rag.loader    import load_documents               # Step 1 – load raw files
@@ -75,17 +78,18 @@ def scan_documents_folder(folder: str) -> dict:
 
 # ── extract file path from document metadata ───────────────────────────────
 
-def get_doc_filepath(doc) -> str:
+def get_doc_filepath(doc, docs_folder: str = DEFAULT_DOCS_FOLDER) -> str:
 
     raw = doc.metadata.get(
         "file_path",
-        doc.metadata.get(
-            "source",
-            doc.metadata.get("file_name", "")         # Last-resort fallback
-        )
+        doc.metadata.get("source", "")
     )
 
-    return os.path.abspath(raw) if raw else ""         # Normalise to absolute path
+    if raw:
+        return os.path.abspath(raw)
+
+    file_name = doc.metadata.get("file_name", "")
+    return os.path.abspath(os.path.join(docs_folder, file_name)) if file_name else ""
 
 
 # ── convert markdown bullet markers into a bullet glyph for display ────────
@@ -99,26 +103,232 @@ def format_bullets(text: str) -> str:
 
 # ── wraps current text in the left-aligned bubble ────────
 
-def render_bubble(text, show_timestamp=False):
+def render_bubble(placeholder, text="", show_timestamp=False, avatar_only=False,):
 
-    clean_text = html.unescape(text)
-    safe_text = html.escape(format_bullets(text)).replace("\n", "<br>")
+    if avatar_only:
+        placeholder.markdown(
+            """
+            <div class="askly-row assistant">
+                <div class="askly-avatar assistant">🤖</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        return
+    
+    cleaned_text = text
+
+    cleaned_text = re.sub(r"<[^>\n]*$", "", text)
+    cleaned_text = re.sub(r"</?[^>]+>", "", cleaned_text)
+
+    safe_text = html.escape(format_bullets(cleaned_text))
+    safe_text = safe_text.replace("\n", "<br>")
+    safe_text = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", safe_text)  # match history redraw formatting
 
     meta_html = (
         f'<div class="askly-meta">🕐 {format_timestamp(datetime.now())}</div>'
         if show_timestamp else ""
     )
 
-    response_placeholder.markdown(
+    bubble_html = (
         f'<div class="askly-row assistant">'
         f'<div class="askly-avatar assistant">🤖</div>'
         f'<div class="askly-content">'
         f'<div class="askly-bubble assistant">{safe_text}</div>'
         f'{meta_html}'
         f'</div>'
-        f'</div>',
-        unsafe_allow_html=True,
+        f'</div>'
     )
+
+    placeholder.markdown(bubble_html, unsafe_allow_html=True,)
+
+
+# ── Feedback logging ──────────────────────────────────────────────────────
+# Path to the CSV file that persists every feedback click across app restarts.
+# session_state is memory-only and resets on refresh, so this file is the
+# only durable record of user feedback.
+FEEDBACK_LOG_PATH = "feedback_log.csv"
+
+
+def _log_feedback_event(idx: int, msg: dict, feedback_value: str | None):
+    """Append a single feedback event as a new row in the CSV log.
+
+    Called every time a user clicks thumbs up/down (including un-clicking,
+    which logs as 'cleared'). Creates the file with a header row on first use.
+    """
+    file_exists = Path(FEEDBACK_LOG_PATH).exists()
+
+    with open(FEEDBACK_LOG_PATH, mode="a", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+
+        # Write header only once, when the file doesn't exist yet
+        if not file_exists:
+            writer.writerow([
+                "timestamp",
+                "chat_id",
+                "message_index",
+                "feedback",
+                "assistant_response",
+            ])
+
+        writer.writerow([
+            datetime.now().isoformat(),                          # when the click happened
+            st.session_state.get("current_chat_id", ""),         # which chat this belongs to
+            idx,                                                 # position of the message in the chat
+            feedback_value if feedback_value else "cleared",     # "up" / "down" / "cleared"
+            msg["content"][:200],                                # truncated preview of the assistant reply
+        ])
+
+    logger.info(f"Feedback logged: idx={idx}, value={feedback_value}")
+
+def render_copy_button(idx: int, text: str):
+    safe_json_text = json.dumps(text)
+
+    copy_component_html = f"""
+    <html>
+    <head>
+    <style>
+        html, body {{
+            margin: 0;
+            padding: 0;
+            background-color: transparent;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            height: 100%;
+        }}
+        #copyBtn {{
+            height: 26px;
+            width: 26px;
+            padding: 0;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            color: #8a939a;
+            font-size: 13px;
+            cursor: pointer;
+            opacity: 0.85;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .12s ease;
+        }}
+        #copyBtn:hover {{
+            background: rgba(0,0,0,0.05);
+            color: #2c3a3f;
+            opacity: 1;
+        }}
+    </style>
+    </head>
+    <body>
+        <button id="copyBtn" title="Copy">📋</button>
+        <script>
+            const btn = document.getElementById('copyBtn');
+            const txt = {safe_json_text};
+
+            btn.addEventListener('click', function() {{
+                function fallbackCopy(t) {{
+                    const ta = document.createElement('textarea');
+                    ta.value = t;
+                    ta.style.position = 'fixed';
+                    ta.style.left = '-9999px';
+                    document.body.appendChild(ta);
+                    ta.focus();
+                    ta.select();
+                    try {{ document.execCommand('copy'); }} catch (e) {{ console.error(e); }}
+                    document.body.removeChild(ta);
+                }}
+
+                if (navigator.clipboard && navigator.clipboard.writeText) {{
+                    navigator.clipboard.writeText(txt).catch(function() {{
+                        fallbackCopy(txt);
+                    }});
+                }} else {{
+                    fallbackCopy(txt);
+                }}
+
+                const original = btn.innerText;
+                btn.innerText = '✅';
+                setTimeout(function() {{ btn.innerText = original; }}, 1200);
+            }});
+        </script>
+    </body>
+    </html>
+    """
+
+    st.iframe(copy_component_html, height=26, width=26)
+
+# ── sync feedback edits back into the persistent chats dict ──────────────
+def _sync_feedback_to_chat_store():
+    cid = st.session_state.get("current_chat_id")
+    if cid and cid in st.session_state["chats"]:
+        st.session_state["chats"][cid]["messages"] = st.session_state["messages"]
+    logger.info(f"Feedback synced to chat store — chat_id={cid}")
+
+
+# ── remove an assistant reply and re-queue its query for regeneration ────
+def _trigger_regeneration(idx: int):
+    if idx == 0:
+        return  # safety guard — an assistant msg should never be at index 0
+
+    user_msg = st.session_state["messages"][idx - 1]
+
+    # Drop the stale assistant turn from display history
+    del st.session_state["messages"][idx]
+
+    # Drop the matching pair from LLM memory, if present
+    ch = st.session_state["chat_history"]
+    if (
+        len(ch) >= 2
+        and ch[-1]["role"] == "assistant"
+        and ch[-2]["role"] == "user"
+        and ch[-2]["content"] == user_msg["content"]
+    ):
+        st.session_state["chat_history"] = ch[:-2]
+
+    logger.info(f"Regenerate requested for query: {user_msg['content']}")
+
+    st.session_state["regenerating"]  = True   # skip re-appending the user turn later
+    st.session_state["pending_query"] = user_msg["content"]
+    st.session_state["processing"]    = True
+    st.rerun(scope="app")
+
+
+# ── render the Copy / Feedback / Regenerate row under an assistant bubble ─
+def render_message_actions(idx: int, msg: dict, is_last_assistant: bool):
+    text = msg["content"]
+    feedback = msg.get("feedback")
+
+    st.markdown('<div class="askly-actions-anchor"></div>', unsafe_allow_html=True)
+
+    # The key parameter renders as a class like "st-key-msg_actions_{idx}" on
+    # this specific container. This lets CSS target ONLY this row instead of
+    # every st.columns()/st.container(horizontal=True) in the whole app —
+    # which was accidentally styling the sidebar's chat list buttons too.
+    with st.container(horizontal=True, gap="small", key=f"msg_actions_{idx}"):
+        render_copy_button(idx, text)
+
+        if st.button("👍", key=f"fb_up_{idx}",
+                      type="primary" if feedback == "up" else "secondary",
+                      help="Give positive feedback"):
+            msg["feedback"] = None if feedback == "up" else "up"
+            _sync_feedback_to_chat_store()
+            _log_feedback_event(idx, msg, msg["feedback"])
+            st.rerun(scope="app")
+
+        if st.button("👎", key=f"fb_down_{idx}",
+                      type="primary" if feedback == "down" else "secondary",
+                      help="Give negative feedback"):
+            msg["feedback"] = None if feedback == "down" else "down"
+            _sync_feedback_to_chat_store()
+            _log_feedback_event(idx, msg, msg["feedback"])
+            st.rerun(scope="app")
+
+        if is_last_assistant:
+            if st.button("🔄", key=f"regen_{idx}",
+                          disabled=st.session_state["processing"],
+                          help="Regenerate response"):
+                _trigger_regeneration(idx)
 
 
 # ── Manage Vector Index Initialization and Incremental Updates ────────────
@@ -229,14 +439,22 @@ def run_startup_indexing(docs_folder: str, status_placeholder) -> tuple:
         # rather than missing content.
         if not new_docs:
             logger.warning(
-                "Metadata path filter matched 0 docs — "
-                "falling back to full reload of all documents."
+                "Metadata path filter matched 0 docs for %d new/modified file(s) — "
+                "falling back to a full rebuild instead of an incremental add "
+                "to avoid duplicating existing vectors.",
+                len(new_files),
             )
             status_placeholder.warning(
                 "⚠️ Could not isolate new files by metadata path. "
-                "Re-indexing all documents as a safe fallback."
+                "Rebuilding the full index as a safe fallback."
             )
-            new_docs = all_docs
+            all_docs = clean_documents(all_docs)
+            chunks = split_documents(all_docs)
+            vectorstore = build_vectorstore(chunks, recorder=current_files)  # full rebuild, not incremental append
+            status_msg = f"✅ Index rebuilt (fallback): {len(current_files)} file(s) · {len(chunks)} chunk(s)"
+            status_placeholder.success(status_msg)
+            logger.info(status_msg)
+            return vectorstore, chunks, status_msg
 
         # Clean
         with st.spinner("🧹 Cleaning new documents..."):
@@ -292,7 +510,7 @@ def run_startup_indexing(docs_folder: str, status_placeholder) -> tuple:
 # ── Page configuration (must be the very first Streamlit call) ───────────────
 
 st.set_page_config(                                    # Configure the Streamlit page metadata
-    page_title="RAG Chatbot",                          # Browser tab title
+    page_title="Askly – Smart Answers, Anytime",       # Browser tab title
     page_icon="🤖",                                    # Browser tab favicon emoji
     layout="wide",                                     # Use full browser width instead of narrow centre column
     initial_sidebar_state="expanded",
@@ -320,19 +538,31 @@ def render_chat_sidebar():
     with button_container:
 
     # ── New Chat button ──
-        if st.button("✏️ New Chat", key="new_chat_btn", use_container_width=True, disabled=busy,):  # Wide button; starts a fresh conversation
-            new_id = str(uuid.uuid4())                          # Generate a unique ID for the new chat
-            st.session_state["current_chat_id"] = new_id        # Set it as the active chat
-            st.session_state["messages"] = []                   # Wipe displayed messages
-            st.session_state["chat_history"] = []               # Wipe LLM memory
-            st.session_state["awaiting_clarification"] = False  # Reset clarification flag
-            st.session_state["chats"][new_id] = {               # Register the new chat in history
-                "title": "New chat",                            # Placeholder title until first message
-                "messages": [],                                 # Empty message list
-                "timestamp": datetime.now()                     # Record creation time
-            }
-            logger.info(f"New chat started — id={new_id}")      # Log the new chat event
-            st.rerun(scope="app")                               # Refresh UI to clear the chat area
+        if st.button("✏️ New Chat", key="new_chat_btn", use_container_width=True, disabled=busy,):  
+            current_id = st.session_state.get("current_chat_id")
+            current    = st.session_state["chats"].get(current_id)
+
+            # If the active chat already has no messages, just reuse it instead
+            # of registering another empty entry that will never be cleaned up.
+            if current and not current["messages"]:
+                st.session_state["messages"] = []
+                st.session_state["chat_history"] = []
+                st.session_state["awaiting_clarification"] = False
+                st.rerun(scope="app")
+            else:
+                # Wide button; starts a fresh conversation
+                new_id = str(uuid.uuid4())                          # Generate a unique ID for the  new chat
+                st.session_state["current_chat_id"] = new_id        # Set it as the active chat
+                st.session_state["messages"] = []                   # Wipe displayed messages
+                st.session_state["chat_history"] = []               # Wipe LLM memory
+                st.session_state["awaiting_clarification"] = False  # Reset clarification flag
+                st.session_state["chats"][new_id] = {               # Register the new chat in history
+                    "title": "New chat",                            # Placeholder title until first     message
+                    "messages": [],                                 # Empty message list
+                    "timestamp": datetime.now()                     # Record creation time
+                }
+                logger.info(f"New chat started — id={new_id}")      # Log the new chat event
+                st.rerun(scope="app")                               # Refresh UI to clear the chat area
 
     # ── Clear Chat button ──
         if st.button("🧹 Clear Chat", key="clear_chat_btn", use_container_width=True ,disabled=busy,):  # Wide button; empties the    CURRENT chat (no new id)
@@ -341,13 +571,23 @@ def render_chat_sidebar():
             st.session_state["chat_history"] = []                  # Wipe LLM memory
             st.session_state["awaiting_clarification"] = False     # Reset clarification flag
             if cid and cid in st.session_state["chats"]:            # Keep the chat entry, just empty it
-                st.session_state["chats"][cid]["messages"]     = []
+                st.session_state["chats"][cid]["messages"] = []
                 st.session_state["chats"][cid]["chat_history"] = []
-                st.session_state["chats"][cid]["title"]        = "New chat"  # Reset title so next msg re-titles it
+                st.session_state["chats"][cid]["title"] = "New chat" # Reset title so next msg re-titles it
+                st.session_state["chat_search_query"] = ""          # Reset search box so the cleared chat is visible in the list
             logger.info(f"Chat cleared — id={cid}")                 # Log the clear event
             st.rerun(scope="app")                                   # Refresh UI to clear the chat area
 
     st.divider()  # Visual separator
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # ── Chat search box ──
+    # Lives inside the fragment (not the outer app), so typing here reruns
+    # only render_chat_sidebar() — NOT the main chat area — keeping it snappy.
+    # Filters the "Recent chats" list below by matching against both the
+    # chat title AND every message's content.
+    # ══════════════════════════════════════════════════════════════════════════
+
 
     # ── Recent chats list ──
     st.markdown(
@@ -355,31 +595,160 @@ def render_chat_sidebar():
         unsafe_allow_html=True,
     )
 
+    search_query = st.text_input(  # Live-filter input box
+        "Search chats",  # Accessibility label (hidden below)
+        key="chat_search_query",  # Session-state key so we can reset it programmatically
+        placeholder="🔍 Search chats...",  # Grey placeholder text shown when empty
+        label_visibility="collapsed",  # Hide the label, keep only the placeholder
+        disabled=busy,  # Lock the box while Askly is processing a query
+    )
+
+    # ── Recent chats section header (swaps label while actively searching) ──
+    if search_query.strip():
+        st.markdown(f"🔍 Results for “{search_query.strip()}”", unsafe_allow_html=True)  # Show what's being searched
+
+    # ── Track which chat (if any) is currently being renamed ──
+    if "renaming_chat_id" not in st.session_state:  # Only one chat can be in "rename mode" at a time
+        st.session_state["renaming_chat_id"] = None
+
     recent_chats_container = st.container()
     
     with recent_chats_container:
-        if st.session_state.get("chats"):                       # Only render if there are past chats
-            for chat_id, chat in sorted(                        # Iterate newest-first, skip empty chats
-                    [(k, v) for k, v in st.session_state["chats"].items() if v["messages"]],  # Skip chats with     no messages
+
+        # ── Start with every non-empty chat (same base filter as before) ──
+        all_chats = [
+            (k, v) for k, v in st.session_state.get("chats", {}).items()
+            if v["messages"]  # Skip chats with no messages
+        ]
+
+        # ── Apply the search filter, if the user has typed anything ──
+        if search_query.strip():
+            q = search_query.strip().lower()  # Normalise query for case-insensitive matching
+
+            def _matches(chat: dict) -> bool:
+                if q in chat["title"].lower():  # Match against the chat's title first (cheap check)
+                    return True
+                return any(  # Fall back to scanning every message's content
+                    q in m.get("content", "").lower()
+                    for m in chat["messages"]
+                )
+
+            all_chats = [(k, v) for k, v in all_chats if _matches(v)]  # Keep only chats that matched
+
+        if all_chats:  # Only render if there's something to show
+            for chat_id, chat in sorted(  # Iterate newest-first
+                    all_chats,
                     key=lambda x: x[1]["timestamp"], reverse=True
             ):
                 is_active = chat_id == st.session_state["current_chat_id"]  # Check if this is the active chat
-                btn_label = f"▶ {chat['title']}" if is_active else chat["title"]  # Highlight active chat
 
-                if st.button(btn_label, key=f"chat_{chat_id}", use_container_width=True, disabled=busy,):  # One    button per chat
-                    st.session_state["current_chat_id"] = chat_id       # Switch to clicked chat
-                    st.session_state["messages"] = chat["messages"]     # Restore its messages
-                    st.session_state["chat_history"] = chat.get("chat_history", [])  # Restore LLM memory
-                    st.session_state["awaiting_clarification"] = False  # Reset clarification flag
-                    logger.info(f"Switched to chat id={chat_id}")       # Log chat switch
-                    st.rerun(scope="app")                               # Refresh whole app so main chat area updates too
+                # ══════════════════════════════════════════════════════════
+                # ── Rename mode for THIS chat: show text input + Save/Cancel ──
+                # ══════════════════════════════════════════════════════════
+                if st.session_state["renaming_chat_id"] == chat_id:
+
+                    new_title = st.text_input(  # Editable title field, pre-filled with current title
+                        "Rename chat",
+                        value=chat["title"],
+                        key=f"rename_input_{chat_id}",
+                        label_visibility="collapsed",
+                        max_chars=40,
+                    )
+
+                    save_col, cancel_col = st.columns([1, 1])  # Two equal-width buttons side by side
+
+                    with save_col:
+                        if st.button("💾 Save", key=f"save_rename_{chat_id}", use_container_width=True):
+                            trimmed = (new_title or "").strip()  # Remove leading/trailing whitespace
+                            if trimmed:  # Ignore empty titles — keep the old one
+                                st.session_state["chats"][chat_id]["title"] = trimmed[:40] + (
+                                    "…" if len(trimmed) > 40 else ""  # Same 40-char cap used for auto-titling
+                                )
+                                logger.info(f"Chat renamed — id={chat_id} → '{trimmed}'")  # Log the rename event
+                            st.session_state["renaming_chat_id"] = None  # Exit rename mode
+                            st.rerun(scope="app")  # Refresh so the new title shows everywhere
+
+                    with cancel_col:
+                        if st.button("✖ Cancel", key=f"cancel_rename_{chat_id}", use_container_width=True):
+                            st.session_state["renaming_chat_id"] = None  # Exit rename mode, discard edits
+                            st.rerun(scope="app")
+
+                    # ── Enter = Save, Escape = Cancel ──
+                    st.iframe(f"""
+                    <script>
+                    (function() {{
+                        const doc = window.parent.document;
+
+                        function attach() {{
+                            const input     = doc.querySelector('.st-key-rename_input_{chat_id} input');
+                            const saveBtn   = doc.querySelector('.st-key-save_rename_{chat_id} button');
+                            const cancelBtn = doc.querySelector('.st-key-cancel_rename_{chat_id} button');
+
+                            if (!input || !saveBtn || !cancelBtn) return false;
+                            if (input.dataset.asklyBound) return true;   
+
+                            input.dataset.asklyBound = "1";
+
+                            input.addEventListener('keydown', function(e) {{
+                                if (e.key === 'Enter') {{
+                                    e.preventDefault();
+                                    input.blur();                       
+                                    setTimeout(function() {{            
+                                        saveBtn.click();
+                                    }}, 60);
+                                }} else if (e.key === 'Escape') {{
+                                        e.preventDefault();
+                                        cancelBtn.click();
+                                }}
+                            }});
+
+                            return true;
+                        }}
+
+                        if (!attach()) {{
+                            const poller = setInterval(function() {{
+                                if (attach()) clearInterval(poller);
+                            }}, 150);
+                            setTimeout(function() {{ clearInterval(poller); }}, 5000);
+                        }}
+                    }})();
+                    </script>
+                    """, height=1, width=1)
+
+                # ══════════════════════════════════════════════════════════
+                # ── Normal mode: chat button + small rename icon beside it ──
+                # ══════════════════════════════════════════════════════════
+                else:
+                    chat_col, rename_col = st.columns([5, 1])  # Chat button takes most of the width; icon is narrow
+
+                    with chat_col:
+                        btn_label = f"▶ {chat['title']}" if is_active else chat["title"]  # Highlight active chat
+
+                        if st.button(btn_label, key=f"chat_{chat_id}", use_container_width=True,
+                                     disabled=busy, ):  # One    button per chat
+                            st.session_state["current_chat_id"] = chat_id  # Switch to clicked chat
+                            st.session_state["messages"] = chat["messages"]  # Restore its messages
+                            st.session_state["chat_history"] = chat.get("chat_history", [])  # Restore LLM memory
+                            st.session_state["awaiting_clarification"] = False  # Reset clarification flag
+                            logger.info(f"Switched to chat id={chat_id}")  # Log chat switch
+                            st.rerun(scope="app")  # Refresh whole app so main chat area updates too
+
+                    with rename_col:
+                        if st.button("⋮", key=f"rename_btn_{chat_id}", use_container_width=True,
+                                     disabled=busy, ):  # Enter rename mode
+                            st.session_state["renaming_chat_id"] = chat_id  # Mark this chat as being renamed
+                            st.rerun(scope="app")  # Refresh to swap in the text input
+
+        elif search_query.strip():  # Search typed but nothing matched
+            st.caption("No matching chats found.")  # Empty-state message
+        # else: no chats exist at all yet — render nothing, same as before
 
     st.write("")
     st.write("")
 
 with st.sidebar:
 
-    # ── Sidebar button styling (ChatGPT-like) ──────────────────────────────
+    # ── Sidebar button styling ──────────────────────────────
     st.markdown("""
     <style>
     
@@ -555,7 +924,7 @@ with st.sidebar:
         text-overflow:ellipsis !important;
     }
 
-    /* ChatGPT-like hover */
+    /* hover */
     [data-testid="stSidebar"] .stButton > button:hover{
         background:rgba(255,255,255,.16) !important;
     }
@@ -631,6 +1000,102 @@ with st.sidebar:
         color: #7b848a !important;
         opacity: .6;
     }
+    
+    /* ── Sidebar search box styling (matches dark sidebar theme) ── */
+    section[data-testid="stSidebar"] div[data-testid="stTextInput"] input {
+        background-color: #2a2a2a !important;   /* Dark input background to match sidebar */
+        border: 1px solid #4a4a4a !important;   /* Slightly stronger border so the box itself reads clearly */
+        border-radius: 8px !important;          /* Rounded corners, consistent with buttons */
+        color: #f5f5f5 !important;              /* Bright text for whatever the user types */
+        caret-color: #f5f5f5 !important;        /* Make sure the blinking cursor is visible too */
+    }
+
+    /* Placeholder text needs its own rule — browsers dim it heavily by default */
+    section[data-testid="stSidebar"] div[data-testid="stTextInput"] input::placeholder {
+        color: #b5b5b5 !important;              /* Light grey, but bright enough to read on #2a2a2a */
+        opacity: 1 !important;                  /* Firefox dims placeholders further unless opacity is forced to 1 */
+    }
+
+    section[data-testid="stSidebar"] div[data-testid="stTextInput"] input:focus {
+        border-color: #7a7a7a !important;       /* Lighter border on focus for feedback */
+        box-shadow: none !important;            /* Remove Streamlit's default blue glow */
+    }
+    
+    /* ── Message action row (Copy / Feedback / Regenerate) — ghost icon style ── */
+    /* Scoped to containers created with key="msg_actions_{idx}" ONLY —
+       using a bare stHorizontalBlock selector here was bleeding into the
+       sidebar's chat-list st.columns(), squashing chat titles. */
+
+    div[class*="st-key-msg_actions_"] button[data-testid="stBaseButton-secondary"],
+    div[class*="st-key-msg_actions_"] button[data-testid="stBaseButton-primary"],
+    div[class*="st-key-msg_actions_"] .stButton > button {
+        height: 26px !important;
+        width: 26px !important;
+        min-height: 26px !important;
+        min-width: 26px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border-radius: 6px !important;
+        border: none !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        color: #8a939a !important;
+        font-size: 13px !important;
+        line-height: 1 !important;
+        box-shadow: none !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        opacity: 0.85;
+        transition: all .12s ease;
+    }
+
+    div[class*="st-key-msg_actions_"] button[data-testid="stBaseButton-secondary"]:hover,
+    div[class*="st-key-msg_actions_"] button[data-testid="stBaseButton-primary"]:hover,
+    div[class*="st-key-msg_actions_"] .stButton > button:hover {
+        background: rgba(0,0,0,0.05) !important;
+        background-color: rgba(0,0,0,0.05) !important;
+        color: #2c3a3f !important;
+        opacity: 1;
+    }
+
+    div[class*="st-key-msg_actions_"] button[data-testid="stBaseButton-secondary"]:active,
+    div[class*="st-key-msg_actions_"] button[data-testid="stBaseButton-primary"]:active,
+    div[class*="st-key-msg_actions_"] .stButton > button:active {
+        background: rgba(0,0,0,0.09) !important;
+        background-color: rgba(0,0,0,0.09) !important;
+    }
+
+    div[class*="st-key-msg_actions_"] button:disabled {
+        opacity: .25 !important;
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    /* Selected feedback state — subtle darker tint, no filled pill */
+    div[class*="st-key-msg_actions_"] button[data-testid="stBaseButton-primary"] {
+        background: rgba(0,0,0,0.06) !important;
+        background-color: rgba(0,0,0,0.06) !important;
+        color: #2c3a3f !important;
+        border: none !important;
+        opacity: 1;
+    }
+
+    div[class*="st-key-msg_actions_"] button[data-testid^="stBaseButton"] p,
+    div[class*="st-key-msg_actions_"] button[data-testid^="stBaseButton"] span {
+        margin: 0 !important;
+        padding: 0 !important;
+        line-height: 1 !important;
+    }
+
+    /* Copy button's iframe matches the same ghost footprint */
+    div[class*="st-key-msg_actions_"] iframe {
+        border: none !important;
+        background: transparent !important;
+        width: 26px !important;
+        height: 26px !important;
+        display: block !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -688,7 +1153,6 @@ if (
     st.title("What can Askly help you today?")
     st.divider()
 
-
 # ══════════════════════════════════════════════════════════════════════════════
 # AUTO-INDEXING ON STARTUP
 # Runs exactly once per session (guarded by the "indexed" session-state flag).
@@ -707,7 +1171,6 @@ if not st.session_state.get("indexed", False):
         st.session_state["indexed"]      = True
         st.session_state["vectorstore"]  = vectorstore
         st.session_state["chunks"]       = chunks
-        st.session_state["index_status"] = status_msg
 
     except (FileNotFoundError, ValueError) as e:
         # Expected configuration errors: folder missing, no supported files, etc.
@@ -752,6 +1215,12 @@ if "processing" not in st.session_state:            # True while a query is bein
 
 if "pending_query" not in st.session_state:          # Holds the query between the submit-rerun and the answer-rerun
     st.session_state["pending_query"] = None
+
+if "stop_requested" not in st.session_state:         # True while the stop button has been clicked
+    st.session_state["stop_requested"] = False       # Reset to False once handled
+
+if "streaming_response" not in st.session_state:     # Durable copy of tokens streamed so far
+    st.session_state["streaming_response"] = ""      # Survives the rerun triggered by clicking stop
 
 if "chats" not in st.session_state:                  # Initialise chat history store on first load
     st.session_state["chats"] = {}                   # Dict of chat_id → {title, messages, timestamp}
@@ -1003,14 +1472,15 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-for msg in st.session_state["messages"]:                    # Loop over every past message
+assistant_indices = [i for i, m in enumerate(st.session_state["messages"]) if m["role"] == "assistant"]
+last_assistant_idx = assistant_indices[-1] if assistant_indices else None
 
+for idx, msg in enumerate(st.session_state["messages"]):
     # Retrieve the saved timestamp string (fallback to empty string if somehow missing)
     ts = msg.get("timestamp", "")                           # pull saved timestamp
-    saved_sources = msg.get("sources", [])                  # retrieve stored list (empty = no sources)
+    saved_sources = msg.get("sources", [])                  # retrieve stored list (empty =no  sources)
     role = msg["role"]                                      # "user" or "assistant"
     avatar_icon = "🧑" if role == "user" else "🤖"           # icon shown per role
-
     if role == "assistant":
         content_html = html.escape(format_bullets(html.unescape(msg["content"])))
         content_html = content_html.replace("\n", "<br>")
@@ -1018,29 +1488,96 @@ for msg in st.session_state["messages"]:                    # Loop over every pa
         content_html = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", content_html)
     else:
         content_html = html.escape(msg["content"])    
-    
     bubble_html = f'<div class="askly-bubble {role}">{content_html}</div>'
-
     if ts:
         bubble_html += f'<div class="askly-meta">🕐 {ts}</div>'
-
-    if role == "assistant" and saved_sources:                # append sources inside the assistant bubble block
+    if role == "assistant" and saved_sources:                # append sources inside theassistant  bubble block
         source_list = "<br>".join(f"📄 {s}" for s in saved_sources)
         bubble_html += f'<div class="askly-sources"><b>Sources:</b><br>{source_list}</div>'
-
     avatar_html = f'<div class="askly-avatar {role}">{avatar_icon}</div>'
-
     # user → bubble first, avatar after (avatar sits on the right);
     # assistant → avatar first, bubble after (avatar sits on the left)
     if role == "user": 
         row_inner = f'<div class="askly-content">{bubble_html}</div>{avatar_html}'
     else:
         row_inner = f'{avatar_html}<div class="askly-content">{bubble_html}</div>'
-
     st.markdown(
     f'<div class="askly-row {role}">{row_inner}</div>',
     unsafe_allow_html=True,
     )
+    if role == "assistant" and not msg.get("stopped"):
+        render_message_actions(idx, msg, is_last_assistant=(idx == last_assistant_idx))
+
+# ── Stop button ──
+if st.session_state["processing"]:
+    with st.container(key="askly_stop_btn_real"):
+        if st.button("Stop", key="askly_stop_btn"):
+            st.session_state["stop_requested"] = True
+
+    st.markdown("""
+    <style>
+    div[class*="st-key-askly_stop_btn_real"] {
+        position: absolute !important;
+        left: -9999px !important;
+        top: -9999px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.iframe("""
+        <script>
+        (function() {
+            function positionProxy() {
+                const doc = window.parent.document;
+                const realBtn  = doc.querySelector('div[class*="st-key-askly_stop_btn_real"] button');
+                const arrowBtn = doc.querySelector('[data-testid="stChatInputSubmitButton"]');
+                if (!realBtn || !arrowBtn) return;
+
+                let proxy = doc.getElementById('askly-stop-proxy');
+                if (!proxy) {
+                    proxy = doc.createElement('button');
+                    proxy.id = 'askly-stop-proxy';
+                    proxy.innerText = '⏹';
+                    proxy.style.position = 'fixed';
+                    proxy.style.zIndex = '999999';
+                    proxy.style.width = '34px';
+                    proxy.style.height = '34px';
+                    proxy.style.borderRadius = '8px';
+                    proxy.style.border = 'none';
+                    proxy.style.background = '#2c3a3f';
+                    proxy.style.color = 'white';
+                    proxy.style.fontSize = '14px';
+                    proxy.style.cursor = 'pointer';
+                    proxy.style.boxShadow = '0 1px 4px rgba(0,0,0,0.25)';
+                    proxy.onmouseenter = () => proxy.style.background = '#445056';
+                    proxy.onmouseleave = () => proxy.style.background = '#2c3a3f';
+                    proxy.onclick = function() { realBtn.click(); };
+                    doc.body.appendChild(proxy);
+                }
+
+                const rect = arrowBtn.getBoundingClientRect();
+                proxy.style.top  = rect.top + 'px';
+                proxy.style.left = (rect.left - 42) + 'px';
+            }
+
+            positionProxy();
+            window.parent.addEventListener('resize', positionProxy);
+            const poller = setInterval(positionProxy, 250);
+            setTimeout(() => clearInterval(poller), 20000);
+        })();
+        </script>
+        """, height=1, width=1)
+
+else:
+    st.iframe("""
+    <script>
+    (function() {
+        const doc = window.parent.document;
+        const proxy = doc.getElementById('askly-stop-proxy');
+        if (proxy) proxy.remove();
+    })();
+    </script>
+    """, height=1, width=1)
 
 
 # ── Chat input box ────────────────────────────────────────────────────────────
@@ -1060,6 +1597,31 @@ if query and not st.session_state["processing"]:            # Fresh submission �
 if st.session_state["processing"] and st.session_state["pending_query"]:  # Only execute on the follow-up rerun
     query = st.session_state["pending_query"]                             # Recover the query saved before the rerun
 
+    # ── Handle stop-generation request ──────────────────────────────────
+    if st.session_state.get("stop_requested"):                            # User clicked stop mid-generation
+        partial = st.session_state.get("streaming_response", "")           # Recover whatever tokens made it through
+        final_text = partial if partial.strip() else "Generation stopped."
+        assistant_ts = format_timestamp(datetime.now())                    # Timestamp for the partial reply
+
+        st.session_state["messages"].append({                              # Save the partial reply as a normal message
+            "role": "assistant",
+            "content": final_text,
+            "timestamp": assistant_ts,
+            "sources": [],
+            "stopped": True,
+        })
+
+        logger.info("Generation stopped by user — partial response saved.")
+
+        st.session_state["stop_requested"]     = False                     # Reset all flags back to idle state
+        st.session_state["streaming_response"] = ""
+        st.session_state["processing"]         = False
+        st.session_state["pending_query"]      = None
+        st.session_state["regenerating"]       = False
+
+        st.rerun(scope="app")                                               # Refresh UI to unlock the input box
+        st.stop()                                                           # Halt execution — skip the RAG logic below
+
     # Guard — should never be False at this point (st.stop() above prevents it),
     # but kept as a defensive check.
     if not st.session_state.get("indexed", False):         # Check session state flag
@@ -1069,33 +1631,40 @@ if st.session_state["processing"] and st.session_state["pending_query"]:  # Only
     # ── Capture the user's query timestamp the moment they submit ──────────────
     user_ts = format_timestamp(datetime.now())             # snapshot time of submission
 
-    # ── Append + display user message (LEFT) ──
-    st.session_state["messages"].append(                   # Append user message to conversation history
-        {"role": "user", "content": query, "timestamp": user_ts}
-    )
+    is_regenerating = st.session_state.get("regenerating", False)
 
-    logger.info(                                           # Record user query
-        f"User query: {query}"
-    )
+    if not is_regenerating:
+        # ── Append + display user message (LEFT) ──
+        st.session_state["messages"].append(
+            {"role": "user", "content": query, "timestamp": user_ts}
+        )
+        logger.info(f"User query: {query}")
 
-    st.markdown(
-        f'<div class="askly-row user">'
-        f'<div class="askly-content">'
-        f'<div class="askly-bubble user">{query}</div>'
-        f'<div class="askly-meta">🕐 {user_ts}</div>'
-        f'</div>'
-        f'<div class="askly-avatar user">🧑</div>'
-        f'</div>',
-        unsafe_allow_html=True,
-    )
+        st.markdown(
+            f'<div class="askly-row user">'
+            f'<div class="askly-content">'
+            f'<div class="askly-bubble user">{query}</div>'
+            f'<div class="askly-meta">🕐 {user_ts}</div>'
+            f'</div>'
+            f'<div class="askly-avatar user">🧑</div>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+    else:
+        st.session_state["regenerating"] = False  # consume the flag
+        logger.info(f"Regenerating answer for query: {query}")
+
 
     # ── Retrieval + assistant response (LEFT) ─────────────────────────────────
 
     response_placeholder = st.empty()                  # In-place container updated token-by-token
     full_response        = ""                          # Accumulator for the complete streamed reply
     sources = []
-            
-    render_bubble(full_response)                        # Show avatar + empty bubble immediately (covers spinner phases)
+    
+    render_bubble(
+        response_placeholder,
+        avatar_only=True
+    )
 
     # ══════════════════════════════════════════════════════════════════
     # BRANCH A — Clarification turn
@@ -1147,7 +1716,7 @@ if st.session_state["processing"] and st.session_state["pending_query"]:  # Only
                 "Clarification: unrecognised reply → re-prompting for Yes / No"
             )
 
-        render_bubble(full_response)
+        render_bubble(response_placeholder, full_response)
 
 
     # ══════════════════════════════════════════════════════════════════
@@ -1165,12 +1734,16 @@ if st.session_state["processing"] and st.session_state["pending_query"]:  # Only
             query,                                         # Original user question (raw)
             st.session_state["chat_history"]               # Prior turns used to resolve references
             )
-            bm25_retriever  = get_bm25_retriever(          # Build BM25 retriever fresh each query (fast – in-memory)
-            st.session_state["chunks"]                     # Pass the cached chunk list
-            )
-            dense_retriever = get_dense_retriever(         # Get dense retriever from the cached vectorstore
-            st.session_state["vectorstore"]                # Pass the Qdrant-backed vectorstore
-            )
+
+            # Build retrievers once per session and reuse — chunks/vectorstore
+            # only change during startup indexing, not on every query.
+            if "bm25_retriever" not in st.session_state:
+                st.session_state["bm25_retriever"] = get_bm25_retriever(st.session_state["chunks"])
+            if "dense_retriever" not in st.session_state:
+                st.session_state["dense_retriever"] = get_dense_retriever(st.session_state["vectorstore"])
+
+            bm25_retriever  = st.session_state["bm25_retriever"]
+            dense_retriever = st.session_state["dense_retriever"]
             docs_with_scores = retrieve(                   # Run full pipeline: BM25 + dense + cross-encoder rerank
             search_query,                                  # User's question
             bm25_retriever,                                # BM25 keyword retriever
@@ -1189,17 +1762,22 @@ if st.session_state["processing"] and st.session_state["pending_query"]:  # Only
                 chat_history=st.session_state["chat_history"]   # pass memory
             ):
                 full_response += token or ""
-                render_bubble(full_response + "")
+                st.session_state["streaming_response"] = full_response  # persist tokens so a mid-stream Stop can recover them
+                render_bubble(response_placeholder, full_response)
+                if st.session_state.get("stop_requested"):               # bail out immediately instead of finishing the full stream
+                    break
 
-        render_bubble(full_response, show_timestamp=True)
+        render_bubble(response_placeholder, full_response, show_timestamp=True)
 
         logger.info(
             f"Generated response ({len(full_response)} chars)"
         )
 
+        is_not_found = full_response.strip().startswith(NOT_FOUND_TRIGGER)
+
         # ── display source filenames ──────────────────────────────
         # Extract unique source filenames from the retrieved chunks
-        if not full_response.strip().startswith(NOT_FOUND_TRIGGER):     # Skip sources entirely if the LLM returned a "not found" reply
+        if not is_not_found:                                # Skip sources entirely if the LLM returned a "not found" reply
             sources = sorted(set(                           # deduplicate and sort alphabetically
                 doc.metadata.get(                           # try LlamaIndex key first
                     "file_name",
@@ -1218,7 +1796,7 @@ if st.session_state["processing"] and st.session_state["pending_query"]:  # Only
         # We only append to memory when the LLM actually found something useful.
         # Clarification exchanges are intentionally excluded from memory to avoid
         # polluting history with "Yes / No" noise.
-        if not full_response.strip().startswith(NOT_FOUND_TRIGGER):
+        if not is_not_found:
             st.session_state["chat_history"].append(             # Append user turn
                 {"role": "user", "content": query}
             )
@@ -1230,7 +1808,7 @@ if st.session_state["processing"] and st.session_state["pending_query"]:  # Only
         # If the primary prompt could not find relevant context it will
         # open its reply with NOT_FOUND_TRIGGER.  We arm the flag so
         # the very next user message is routed to the clarification chain.
-        if full_response.strip().startswith(NOT_FOUND_TRIGGER):
+        if is_not_found:
             st.session_state["awaiting_clarification"] = True
 
             logger.info(
@@ -1259,7 +1837,7 @@ if st.session_state["processing"] and st.session_state["pending_query"]:  # Only
         st.session_state["chats"][cid]["title"] = query[:40] + ("…" if len(query) > 40 else "")  # Use first query as title
 
     # ── Sync messages and memory back to chats history store ───────────────
-    if cid := st.session_state.get("current_chat_id"):                                # Get ctive chat ID if set
+    if cid:                                                                                # Get ctive chat ID if set
         st.session_state["chats"][cid]["messages"]     = st.session_state["messages"]      # Persist messages
         st.session_state["chats"][cid]["chat_history"] = st.session_state["chat_history"]  # Persist LLM memory
 

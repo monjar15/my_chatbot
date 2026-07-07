@@ -9,7 +9,7 @@ from rag.logger import logger                              # Shared logger insta
 
 # ── Configuration constants ──────────────────────────────────────────────────
 
-LLM_MODEL   = "qwen3:1.7b"   # TIP: Use "qwen3:1.7b/no_think " to disable thinking mode for faster (but less reasoned) answers
+LLM_MODEL   = "qwen3:1.7b"     # TIP: Use "qwen3:1.7b/no_think " to disable thinking mode for faster (but less reasoned) answers
 LLM_TEMP    = 0              # Low temperature → more deterministic, factual answers (0 = fully deterministic)
 LLM_TOKENS  = 4608           # Maximum number of tokens the LLM is allowed to generate per response
 LLM_KEEP_ALIVE = "30m"       # Keep model loaded in VRAM between requests (reduces reload latency)
@@ -17,6 +17,7 @@ LLM_KEEP_ALIVE = "30m"       # Keep model loaded in VRAM between requests (reduc
 LLM_NUM_CTX = 16384          # Cap context window — measure your actual prompt size (context + history + question)
                              # and set this just above it; avoid leaving it unset (defaults can be larger than needed)
 LLM_SEED = 42                # Fixed seed → combined with temperature=0, removes run-to-run sampling variance
+LLM_REPEAT_PENALTY = 1.15    # Guards against repeated/looping list items on enumeration queries
 
 # ── LLM initialiser ──────────────────────────────────────────────────────────
 
@@ -28,7 +29,8 @@ def get_llm() -> ChatOllama:
         num_predict=LLM_TOKENS,
         keep_alive=LLM_KEEP_ALIVE,
         num_ctx=LLM_NUM_CTX,
-        seed=LLM_SEED,    
+        seed=LLM_SEED,
+        repeat_penalty=LLM_REPEAT_PENALTY,    
     )
 
     logger.info(                   # Record loaded LLM configuration
@@ -64,8 +66,8 @@ QUESTION: {question}
 ──────────────────────────────────────────
 INSTRUCTIONS — follow in this exact order:
 
-STEP 1 — SEARCH: Carefully read every sentence in the documents above \
-and identify all passages that are relevant to the QUESTION. \
+STEP 1 — SEARCH: CAREFULLY read EVERY sentence in the documents above \
+and identify ALL passages that are RELEVANT to the QUESTION. \
 You may use the CHAT HISTORY to understand follow-up questions \
 (e.g. resolving pronouns like "it", "that", "they", "him", "her", "he", or "she"), \
 but NEVER use history as a knowledge source.
@@ -77,11 +79,12 @@ Do not infer, assume, or speculate beyond what is written.
 
 STEP 3 — FORMAT: Use bullet points only when listing multiple distinct items. \
 Otherwise, respond in short, direct paragraphs. \
-Answer as a knowledgeable assistant speaking in your own words — never use the \
-words "chunks", "passages", "excerpts", or any other retrieval-related term \
+Answer as a knowledgeable assistant speaking in your own words — NEVER USE the \
+words "chunks", "passages", "excerpts", "reference", or any other retrieval-related term \
 when phrasing your answer. \
-Do not say things like "According to the provided chunks/reference" or "Based on the \
-passages above" — just state the information directly as fact.
+DO NOT say things like "According to the provided chunks 1, or 2 or 3, or 4", "According \
+to the provided reference 1, or 2 or 3, or 4", or "Based on the passages above" — just \
+state the information directly as fact.
 
 STEP 4 — NOT FOUND: Only if the documents contains absolutely no information \
 relevant to the QUESTION — after carefully completing STEP 1 — \
@@ -123,7 +126,7 @@ def _format_context(docs_with_scores: list[tuple[Document, float]]) -> str:
         )
 
         parts.append(                                  # Build a clearly delimited chunk block
-            f"[Reference {i} | Source: {source}]\n"    # Header source
+            f"({source})\n"                            # Source
             f"{doc.page_content}"                      # The actual text content of the chunk
         )
 
@@ -185,15 +188,11 @@ REWRITTEN QUESTION:"""
             f"Rewrite output contained a <think> block — stripped before use. Raw length was {len(raw_output)} chars after cleanup"
         )
 
-    rewritten = raw_output
+    logger.info(f"Query rewrite: '{query}' → '{raw_output}'")
 
-    logger.info(
-        f"Query rewrite: '{query}' → '{rewritten}'"
-    )
+    print(f"[Chain] Query rewrite: '{query}' → '{raw_output}'")  # Log rewrite for debugging
 
-    print(f"[Chain] Query rewrite: '{query}' → '{rewritten}'")  # Log rewrite for debugging
-
-    return rewritten if rewritten else query             # Fallback to original if rewrite came back empty
+    return raw_output or query                                  # Fallback to original if rewrite came back empty
 
 
 # ── Streaming RAG call ────────────────────────────────────────────────────────
@@ -251,11 +250,11 @@ def run_rag_chain_stream(
 
     for token in chain.stream({                        # .stream() yields partial text chunks instead of blocking
         "context":  context,                           # Formatted retrieved passages
-        "question": f"{query}",                        # User's question
+        "question": query,                             # User's question
         "chat_history": history_str,                   # pass formatted history to prompt
     }):
         token_count += 1                               # Increment token counter
-        yield token                                    # Yield the current token to the Streamlit caller
+        buffer += token                                # ← feed the token into the filter buffer caller
 
         while True:
             if not in_think:
