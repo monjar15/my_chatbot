@@ -8,8 +8,10 @@ from langchain_core.documents import Document                      # LangChain's
 from langchain_huggingface import HuggingFaceEmbeddings            
 from langchain_qdrant import QdrantVectorStore                     # LangChain adapter for Qdrant vector database
 from qdrant_client import QdrantClient                             # Low-level Qdrant Python client
-from qdrant_client.models import Distance, VectorParams            # Config objects: cosine distance + vector dimensions
-
+from qdrant_client.models import (                                 # Config objects: cosine distance + vector dimensions
+    Distance, VectorParams,
+    Filter, FieldCondition, MatchValue                             # Needed to delete vectors by metadata (source file path)
+)
 
 # ── Configuration constants ──────────────────────────────────────────────────
 
@@ -217,3 +219,59 @@ def load_chunks_cache() -> list[Document]:
     print(f"[Embedding] ✅ Loaded {len(chunks)} chunks from cache '{CHUNKS_CACHE_PATH}'")  # Confirm load
 
     return chunks
+
+
+# ── Remove chunks/vectors for deleted source files (DELETION) ───────────────
+
+def remove_documents_by_source(
+    deleted_paths: set[str],
+    updated_recorder: dict
+) -> QdrantVectorStore:
+
+    embeddings = get_embedding_model()
+
+    client = QdrantClient(path=QDRANT_PATH)            # Open existing storage
+
+    vectorstore = QdrantVectorStore(
+        client=client,
+        collection_name=COLLECTION_NAME,
+        embedding=embeddings
+    )
+
+    # ── Delete vectors from Qdrant whose payload matches any deleted file path ──
+    for path in deleted_paths:
+        deletion_filter = Filter(
+            should=[                                    # OR — match either metadata key that may hold the path
+                FieldCondition(key="metadata.source", match=MatchValue(value=path)),
+                FieldCondition(key="metadata.file_path", match=MatchValue(value=path)),
+            ]
+        )
+        client.delete(
+            collection_name=COLLECTION_NAME,
+            points_selector=deletion_filter
+        )
+    print(f"[Embedding] 🗑️ Removed vectors for {len(deleted_paths)} deleted file(s) from Qdrant")
+
+    # ── Filter deleted files' chunks out of the BM25 cache ──
+    existing_chunks: list[Document] = []
+    if os.path.exists(CHUNKS_CACHE_PATH):
+        with open(CHUNKS_CACHE_PATH, "rb") as f:
+            existing_chunks = pickle.load(f)
+
+    def _chunk_path(doc: Document) -> str:
+        return doc.metadata.get("file_path", doc.metadata.get("source", ""))
+
+    remaining_chunks = [
+        doc for doc in existing_chunks
+        if _chunk_path(doc) not in deleted_paths
+    ]
+
+    with open(CHUNKS_CACHE_PATH, "wb") as f:
+        pickle.dump(remaining_chunks, f)
+    print(f"[Embedding] ✅ Chunk cache updated: {len(remaining_chunks)} chunk(s) remain "
+          f"(removed {len(existing_chunks) - len(remaining_chunks)})")
+
+    # ── Save the updated recorder (deleted paths removed) ──
+    save_recorder(updated_recorder)
+
+    return vectorstore

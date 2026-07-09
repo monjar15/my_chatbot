@@ -1,90 +1,61 @@
-import os                                           # Standard library for file and directory operations
+import os
+import logging
+from logging.handlers import RotatingFileHandler
 
-import logging                                      # Python logging framework
+# ══════════════════════════════════════════════════════════════════════════
+# CONFIGURATION
+# ══════════════════════════════════════════════════════════════════════════
 
+LOG_DIR = "logs"                      # Directory where log files are stored
+LOG_FILE = "chatbot.log"              # Log file name
+LOG_LEVEL = logging.INFO              # Minimum level captured (INFO, WARNING, ERROR, CRITICAL)
+LOG_FORMAT = "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
+LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
-# ── Logging Configuration ────────────────────────────────────────────────────
+MAX_LOG_SIZE_BYTES = 5 * 1024 * 1024  # Rotate once a log file hits 5 MB
+BACKUP_COUNT = 3                      # Keep up to 3 old log files (chatbot.log.1, .2, .3)
 
-LOG_DIR = "logs"                                    # Directory where log files will be stored
-
-LOG_FILE = "chatbot.log"                            # Name of the log file
-
-LOG_LEVEL = logging.INFO                            # Record INFO, WARNING, ERROR and CRITICAL logs
-
-
-# ── Create Log Directory ─────────────────────────────────────────────────────
-
-os.makedirs(                                        # Create logs directory if it does not exist
-    LOG_DIR,                                        # Target directory path
-    exist_ok=True                                   # Prevent error if directory already exists
+# Third-party libraries whose verbose INFO logs we want suppressed
+THIRD_PARTY_LOGGERS_TO_SILENCE = (
+    "sentence_transformers",
+    "huggingface_hub",
+    "transformers",
+    "httpx",
+    "qdrant_client",
 )
 
+# ══════════════════════════════════════════════════════════════════════════
+# SETUP
+# ══════════════════════════════════════════════════════════════════════════
 
-# ── Create Shared Logger ─────────────────────────────────────────────────────
+os.makedirs(LOG_DIR, exist_ok=True)  # Ensure the logs directory exists before writing
 
-logger = logging.getLogger(                         # Create named logger instance
-    "chatbot"                                       # Logger name
-)
+logger = logging.getLogger("chatbot")
+logger.setLevel(LOG_LEVEL)
 
-logger.setLevel(                                    # Set minimum logging level
-    LOG_LEVEL                                       # INFO and above
-)
+# Guard against duplicate handlers if this module gets imported more than once
+# (e.g. Streamlit reruns, or multiple modules importing `logger`)
+if not logger.handlers:
 
+    formatter = logging.Formatter(LOG_FORMAT, datefmt=LOG_DATE_FORMAT)
 
-# ── Prevent Duplicate Handlers ───────────────────────────────────────────────
-
-if not logger.handlers:                             # Configure logger only once
-
-    file_handler = logging.FileHandler(             # Create file output handler
-        os.path.join(                               # Build full log file path
-            LOG_DIR,                                # Logs directory
-            LOG_FILE                                # Log file name
-        )
+    # ── Rotating file handler ────────────────────────────────────────────
+    # Automatically rotates the log file once it exceeds MAX_LOG_SIZE_BYTES,
+    # keeping BACKUP_COUNT old copies instead of growing one file forever.
+    file_handler = RotatingFileHandler(
+        filename=os.path.join(LOG_DIR, LOG_FILE),
+        maxBytes=MAX_LOG_SIZE_BYTES,
+        backupCount=BACKUP_COUNT,
+        encoding="utf-8",   # Prevents UnicodeEncodeError from emoji/Unicode in log messages
     )
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
 
-    formatter = logging.Formatter(                  # Define log message format
-        "%(asctime)s | %(levelname)s | %(message)s" # Timestamp | Level | Message
-    )
+    logger.propagate = False  # Don't also send these logs up to the root logger
 
-    file_handler.setFormatter(                      # Attach formatter to file handler
-        formatter
-    )
+# ══════════════════════════════════════════════════════════════════════════
+# THIRD-PARTY LOG NOISE REDUCTION
+# ══════════════════════════════════════════════════════════════════════════
 
-    logger.addHandler(                              # Register file handler with logger
-        file_handler
-    )
-
-    logger.propagate = False                        # Prevent logs from being sent to root logger
-
-
-# ── Silence Third-Party Library Logs ─────────────────────────────────────────
-
-logging.getLogger(                                  # Access SentenceTransformers logger
-    "sentence_transformers"
-).setLevel(
-    logging.WARNING                                 # Show only warnings and errors
-)
-
-logging.getLogger(                                  # Access HuggingFace logger
-    "huggingface_hub"
-).setLevel(
-    logging.WARNING                                 # Hide INFO messages
-)
-
-logging.getLogger(                                  # Access Transformers logger
-    "transformers"
-).setLevel(
-    logging.WARNING                                 # Hide INFO messages
-)
-
-logging.getLogger(                                  # Access HTTPX logger
-    "httpx"
-).setLevel(
-    logging.WARNING                                 # Hide HTTP request logs
-)
-
-logging.getLogger(                                  # Access Qdrant logger
-    "qdrant_client"
-).setLevel(
-    logging.WARNING                                 # Hide Qdrant INFO messages
-)
+for lib_name in THIRD_PARTY_LOGGERS_TO_SILENCE:
+    logging.getLogger(lib_name).setLevel(logging.WARNING)
