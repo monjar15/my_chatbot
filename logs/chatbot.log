@@ -7463,6 +7463,7 @@ RuntimeError: Storage folder ./qdrant_storage is already accessed by another ins
 2026-07-07 19:08:01 | INFO     | chatbot | Stream complete (500 token(s))
 2026-07-07 19:08:01 | INFO     | chatbot | Generated response (1138 chars)
 2026-07-07 19:08:01 | INFO     | chatbot | ================================================================================
+<<<<<<< HEAD
 2026-07-09 12:14:00 | INFO     | chatbot | Chatbot application started
 2026-07-09 12:14:00 | INFO     | chatbot | Incremental index: 12 new/modified file(s), 13 deleted file(s) detected
 2026-07-09 12:14:30 | INFO     | chatbot | Removed 13 deleted file(s) from index
@@ -8247,3 +8248,5 @@ RuntimeError: Storage folder ./qdrant_storage is already accessed by another ins
 2026-07-10 00:59:02 | INFO     | chatbot | Stream complete (309 token(s))
 2026-07-10 00:59:02 | INFO     | chatbot | Generated response (356 chars)
 2026-07-10 00:59:02 | INFO     | chatbot | ================================================================================
+=======
+>>>>>>> 4c6ce467e4a579552f7b62b86685d1272a90b79e
