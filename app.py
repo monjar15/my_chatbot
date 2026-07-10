@@ -996,6 +996,79 @@ for idx, msg in enumerate(st.session_state["messages"]):
     f'<div class="askly-row {role}">{row_inner}</div>',
     unsafe_allow_html=True,
     )
+    if role == "assistant" and not msg.get("stopped"):
+        render_message_actions(idx, msg, is_last_assistant=(idx == last_assistant_idx))
+
+# ── Stop button ──
+if st.session_state["processing"]:
+    with st.container(key="askly_stop_btn_real"):
+        if st.button("Stop", key="askly_stop_btn"):
+            st.session_state["stop_requested"] = True
+
+    st.markdown("""
+    <style>
+    div[class*="st-key-askly_stop_btn_real"] {
+        position: absolute !important;
+        left: -9999px !important;
+        top: -9999px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.iframe("""
+        <script>
+        (function() {
+            function positionProxy() {
+                const doc = window.parent.document;
+                const realBtn  = doc.querySelector('div[class*="st-key-askly_stop_btn_real"] button');
+                const arrowBtn = doc.querySelector('[data-testid="stChatInputSubmitButton"]');
+                if (!realBtn || !arrowBtn) return;
+
+                let proxy = doc.getElementById('askly-stop-proxy');
+                if (!proxy) {
+                    proxy = doc.createElement('button');
+                    proxy.id = 'askly-stop-proxy';
+                    proxy.innerText = '⏹';
+                    proxy.style.position = 'fixed';
+                    proxy.style.zIndex = '999999';
+                    proxy.style.width = '34px';
+                    proxy.style.height = '34px';
+                    proxy.style.borderRadius = '8px';
+                    proxy.style.border = 'none';
+                    proxy.style.background = '#2c3a3f';
+                    proxy.style.color = 'white';
+                    proxy.style.fontSize = '14px';
+                    proxy.style.cursor = 'pointer';
+                    proxy.style.boxShadow = '0 1px 4px rgba(0,0,0,0.25)';
+                    proxy.onmouseenter = () => proxy.style.background = '#445056';
+                    proxy.onmouseleave = () => proxy.style.background = '#2c3a3f';
+                    proxy.onclick = function() { realBtn.click(); };
+                    doc.body.appendChild(proxy);
+                }
+
+                const rect = arrowBtn.getBoundingClientRect();
+                proxy.style.top  = rect.top + 'px';
+                proxy.style.left = (rect.left - 42) + 'px';
+            }
+
+            positionProxy();
+            window.parent.addEventListener('resize', positionProxy);
+            const poller = setInterval(positionProxy, 250);
+            setTimeout(() => clearInterval(poller), 20000);
+        })();
+        </script>
+        """, height=1, width=1)
+
+else:
+    st.iframe("""
+    <script>
+    (function() {
+        const doc = window.parent.document;
+        const proxy = doc.getElementById('askly-stop-proxy');
+        if (proxy) proxy.remove();
+    })();
+    </script>
+    """, height=1, width=1)
 
     if role == "assistant" and not msg.get("stopped"):
         render_message_actions(idx, msg, is_last_assistant=(idx == last_assistant_idx))

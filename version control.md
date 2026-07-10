@@ -99,15 +99,3 @@ version 0.6	impprovement
 		Improved the quality and consistency of result
 		Added the document deletion detection
 		Added the empty string guard on input box
-version 0.7 improvement
-		Added guard for long query that consumed the token
-		Improved the stopped button functionality during
-				mid-stream
-		Improved the source display filename truncation if
-				the filename is too long
-		Added the feature that the recent chat persist
-				upon page reloading
-		Added the error message for backend and reference 
-				source failure.
-				 
-		
