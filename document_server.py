@@ -85,6 +85,79 @@ def view_source():
         as_attachment=False,
     )
 
+###############################################################################
+# Custom Error Pages
+# Flask's default abort() pages are plain, unbranded HTML — replace them
+# with a simple friendly page so a broken/missing source link fails
+# gracefully instead of showing a raw server error screen.
+###############################################################################
+
+def render_error_page(title: str, message: str) -> str:
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>{title} — Askly</title>
+        <style>
+            body {{
+                font-family: 'Georgia', 'Times New Roman', serif;
+                background-color: #c4c9ce;
+                color: #2c3a3f;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                margin: 0;
+            }}
+            .error-box {{
+                background: #e7eaec;
+                border: 1px solid #c2c9ce;
+                border-radius: 12px;
+                padding: 32px 40px;
+                text-align: center;
+                max-width: 420px;
+            }}
+            h1 {{ font-size: 20px; margin-bottom: 12px; }}
+            p {{ font-size: 15px; color: #4b5358; }}
+        </style>
+    </head>
+    <body>
+        <div class="error-box">
+            <h1>📄 {title}</h1>
+            <p>{message}</p>
+        </div>
+    </body>
+    </html>
+    """
+
+@app.errorhandler(400)
+def handle_bad_request(e):
+    return render_error_page(
+        "Missing file",
+        "No file was specified in the request."
+    ), 400
+
+@app.errorhandler(403)
+def handle_forbidden(e):
+    return render_error_page(
+        "Access denied",
+        "You don't have permission to view this file."
+    ), 403
+
+@app.errorhandler(404)
+def handle_not_found(e):
+    return render_error_page(
+        "Source not found",
+        "This document may have been moved, renamed, or deleted."
+    ), 404
+
+@app.errorhandler(500)
+def handle_server_error(e):
+    return render_error_page(
+        "Something went wrong",
+        "The document server ran into an unexpected error. Please try again."
+    ), 500
+
 
 ###############################################################################
 # Main

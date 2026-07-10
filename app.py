@@ -11,6 +11,7 @@ from pathlib import Path
 import urllib.parse                                    # for encoding filenames in the ?view_source= link
 import subprocess
 import socket
+import atexit                                          # Run cleanup code when the application exits
 
 # ── Import our custom RAG modules ────────────────────────────────────────────
 from rag.loader    import load_documents               # Step 1 – load raw files
@@ -33,7 +34,8 @@ from rag.retrieval import (                            # Step 4 – retrieve rel
 )
 from rag.chain import (
     run_rag_chain_stream,                              # Step 5 – stream the LLM answer
-    rewrite_query_with_history                         # Resolve pronouns/follow-ups before retrieval
+    rewrite_query_with_history,                        # Resolve pronouns/follow-ups before retrieval
+    LLM_NUM_CTX                                        # Cap context window — measure your actual prompt size (context + history + question)
 )
 from rag.logger import logger                          # Shared logger instance
 import styles                                          # CSS + static HTML markup, kept out of app.py
@@ -52,6 +54,14 @@ SUPPORTED_EXTENSIONS = {
 }
 
 FEEDBACK_LOG_PATH = "feedback_log.csv"              # Path to the CSV file that persists every feedback click across app restarts.
+APP_DIR           = Path(__file__).resolve().parent
+CHATS_STORE_PATH  = str(APP_DIR / "chats_store.json")  # Path to the JSON file that persists the recent-chats list across page reloads.
+
+QUERY_CHAR_PER_TOKEN   = 4
+QUERY_TOKEN_BUDGET     = int(LLM_NUM_CTX * 0.25)            # Reserve ~25% of context window for the raw query
+QUERY_TOKEN_WARN_RATIO = 0.9                                # Warn at 90% of that budget ("almost" the limit)
+
+MAX_SOURCE_FILENAME_LENGTH = 90                             # adjust this number to taste
 
 DOCUMENT_SERVER_PORT = 8000
 
@@ -60,6 +70,7 @@ DOCUMENT_SERVER_PORT = 8000
 # ══════════════════════════════════════════════════════════════════════════════
 
 def is_document_server_running():
+
     try:
         sock = socket.create_connection(
             ("127.0.0.1", DOCUMENT_SERVER_PORT),
@@ -86,7 +97,53 @@ def start_document_server():
 # ── format a timestamp for display ────────────────────────────────────────────
 
 def format_timestamp(dt: datetime) -> str:
+
     return dt.strftime("%I:%M %p · %b %d, %Y")           # e.g. 02:45 PM · Jun 25, 2026
+
+
+def load_chats_from_disk() -> dict:
+
+    if not os.path.exists(CHATS_STORE_PATH):
+        logger.info(f"No chats store found at {CHATS_STORE_PATH} — starting with an empty recent list.")
+        return {}
+    try:
+        with open(CHATS_STORE_PATH, "r", encoding="utf-8") as f:
+            raw = json.load(f)
+        for chat in raw.values():
+            chat["timestamp"] = datetime.fromisoformat(chat["timestamp"])  # str -> datetime
+        logger.info(f"Loaded {len(raw)} chat(s) from {CHATS_STORE_PATH}.")  # Confirms the file was actually found and read
+        return raw
+    except Exception as e:
+        # Don't let a corrupt/partial file nuke the recent list — log loudly and keep going.
+        logger.error(f"Failed to load chats store at {CHATS_STORE_PATH}: {e}", exc_info=True)
+        return {}
+
+
+def save_chats_to_disk(chats: dict) -> None:
+
+    try:
+        serialisable = {
+            cid: {**chat, "timestamp": chat["timestamp"].isoformat()}   # datetime -> str
+            for cid, chat in chats.items()
+        }
+        with open(CHATS_STORE_PATH, "w", encoding="utf-8") as f:
+            json.dump(serialisable, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        logger.error(f"Failed to save chats store: {e}", exc_info=True)
+
+
+def clear_chat_store_on_exit() -> None:
+
+    try:
+        if os.path.exists(CHATS_STORE_PATH):
+            os.remove(CHATS_STORE_PATH)
+            logger.info("Recent chat store cleared on application shutdown.")
+    except Exception as e:
+        logger.error(f"Failed to clear chat store on shutdown: {e}", exc_info=True)
+
+
+# Register the cleanup handler once.
+atexit.register(clear_chat_store_on_exit)
 
 
 # ── scan documents directory and record file metadata ─────────────────────────
@@ -124,6 +181,23 @@ def get_doc_filepath(doc, docs_folder: str = DEFAULT_DOCS_FOLDER) -> str:
     return os.path.abspath(os.path.join(docs_folder, file_name)) if file_name else ""
 
 
+# ── Limit how long a source filename can display before truncating it ──────
+
+def truncate_filename(filename: str, max_length: int = MAX_SOURCE_FILENAME_LENGTH) -> str:
+
+    if len(filename) <= max_length:          # short enough already — no changes needed
+        return filename
+
+    name, ext = os.path.splitext(filename)   
+
+    # Reserve room for the extension + ellipsis, then trim the name itself
+    keep_length = max_length - len(ext) - 1  # -1 for the "…" character
+    if keep_length < 1:                      # extension alone is already too long — just hard-cut
+        return filename[:max_length] + "…"
+
+    return name[:keep_length] + "…" + ext 
+
+
 # ── build a clickable file:// link for a source filename ───────────────────
 
 def build_source_html(filename: str) -> str:
@@ -135,12 +209,15 @@ def build_source_html(filename: str) -> str:
         f"/view_source?file={encoded}"
     )
 
+    display_name = truncate_filename(filename)   # shortened version — only for what the user sees
+
     return (
         f'<a href="{file_url}" '
         f'target="_blank" '
         f'rel="noopener noreferrer" '
-        f'class="askly-source-link">'
-        f'📄 {html.escape(filename)}'
+        f'class="askly-source-link"'
+        f'title="{html.escape(filename)}">'      # tooltip still shows the FULL filename on hover
+        f'📄 {html.escape(display_name)}'
         f'</a>'
     )
 
@@ -511,6 +588,47 @@ def run_startup_indexing(docs_folder: str, status_placeholder) -> tuple:
 
 start_document_server()
 
+# ══════════════════════════════════════════════════════════════════════════════
+# SESSION STATE – Initialise all chat-related keys on first load
+# ══════════════════════════════════════════════════════════════════════════════
+
+if "messages" not in st.session_state:               # Only initialise if the key doesn't exist yet
+    st.session_state["messages"] = []                # Full conversation history for display
+
+if "chat_history" not in st.session_state:
+    st.session_state["chat_history"] = []            # plain memory list fed to the LLM prompt
+
+if "awaiting_clarification" not in st.session_state:
+    st.session_state["awaiting_clarification"] = False
+
+if "processing" not in st.session_state:            # True while a query is being answered
+    st.session_state["processing"] = False
+
+if "pending_query" not in st.session_state:          # Holds the query between the submit-rerun and the answer-rerun
+    st.session_state["pending_query"] = None
+
+if "stop_requested" not in st.session_state:         # True while the stop button has been clicked
+    st.session_state["stop_requested"] = False       # Reset to False once handled
+
+if "streaming_response" not in st.session_state:     # Durable copy of tokens streamed so far
+    st.session_state["streaming_response"] = ""      # Survives the rerun triggered by clicking stop
+
+if "chats" not in st.session_state:                  # Initialise chat history store on first load
+    st.session_state["chats"] = load_chats_from_disk()  # Restore the recent-chats list saved from a prior reload
+
+if "current_chat_id" not in st.session_state:        # Track which chat is currently active
+    st.session_state["current_chat_id"] = None       # None means no active chat yet
+
+if st.session_state["current_chat_id"] is None:      # First ever load OR fresh reload — always start on a blank chat
+    _init_id = str(uuid.uuid4())                            # Generate ID for this session's chat
+    st.session_state["current_chat_id"] = _init_id          # Set as active
+    st.session_state["chats"][_init_id] = {                 # Register in history
+        "title":     "New chat",                            # Default title
+        "messages":  [],                                    # Empty messages
+        "timestamp": datetime.now()                         # Record creation time
+    }
+    save_chats_to_disk(st.session_state["chats"])           # Persist so the new entry survives a reload too
+
 st.set_page_config(                                    # Configure the Streamlit page metadata
     page_title="Askly – Smart Answers, Anytime",       # Browser tab title
     page_icon="🤖",                                    # Browser tab favicon emoji
@@ -563,6 +681,7 @@ def render_chat_sidebar():
                     "messages": [],                                 # Empty message list
                     "timestamp": datetime.now()                     # Record creation time
                 }
+                save_chats_to_disk(st.session_state["chats"])       # Persist so this chat survives a reload
                 logger.info(f"New chat started — id={new_id}")      # Log the new chat event
                 st.rerun(scope="app")                               # Refresh UI to clear the chat area
 
@@ -577,6 +696,7 @@ def render_chat_sidebar():
                 st.session_state["chats"][cid]["chat_history"] = []
                 st.session_state["chats"][cid]["title"] = "New chat" # Reset title so next msg re-titles it
                 st.session_state["chat_search_query"] = ""          # Reset search box so the cleared chat is visible in the list
+                save_chats_to_disk(st.session_state["chats"])       # Persist the cleared state
             logger.info(f"Chat cleared — id={cid}")                 # Log the clear event
             st.rerun(scope="app")                                   # Refresh UI to clear the chat area
 
@@ -669,6 +789,7 @@ def render_chat_sidebar():
                                 st.session_state["chats"][chat_id]["title"] = trimmed[:40] + (
                                     "…" if len(trimmed) > 40 else ""  # Same 40-char cap used for auto-titling
                                 )
+                                save_chats_to_disk(st.session_state["chats"])  # Persist the renamed title
                                 logger.info(f"Chat renamed — id={chat_id} → '{trimmed}'")  # Log the rename event
                             st.session_state["renaming_chat_id"] = None  # Exit rename mode
                             st.rerun(scope="app")  # Refresh so the new title shows everywhere
@@ -761,6 +882,11 @@ with st.sidebar:
 
     render_chat_sidebar()
 
+    _sidebar_status = st.session_state.pop("sidebar_status", None)
+    if _sidebar_status:
+        st.divider()
+        getattr(st, _sidebar_status["level"])(_sidebar_status["message"])
+
 # ── Silent status sink ────────────────────────────────────────────────────
 # No longer displayed in the sidebar. run_startup_indexing() still calls
 # .info()/.success()/.error()/.warning() on this object internally, so we
@@ -826,47 +952,6 @@ if not st.session_state.get("indexed", False):
 else:
     # Already indexed this session — just restore the status message in the sidebar
     pass
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-# SESSION STATE – Initialise all chat-related keys on first load
-# ══════════════════════════════════════════════════════════════════════════════
-
-if "messages" not in st.session_state:               # Only initialise if the key doesn't exist yet
-    st.session_state["messages"] = []                # Full conversation history for display
-
-if "chat_history" not in st.session_state:
-    st.session_state["chat_history"] = []            # plain memory list fed to the LLM prompt
-
-if "awaiting_clarification" not in st.session_state:
-    st.session_state["awaiting_clarification"] = False
-
-if "processing" not in st.session_state:            # True while a query is being answered
-    st.session_state["processing"] = False
-
-if "pending_query" not in st.session_state:          # Holds the query between the submit-rerun and the answer-rerun
-    st.session_state["pending_query"] = None
-
-if "stop_requested" not in st.session_state:         # True while the stop button has been clicked
-    st.session_state["stop_requested"] = False       # Reset to False once handled
-
-if "streaming_response" not in st.session_state:     # Durable copy of tokens streamed so far
-    st.session_state["streaming_response"] = ""      # Survives the rerun triggered by clicking stop
-
-if "chats" not in st.session_state:                  # Initialise chat history store on first load
-    st.session_state["chats"] = {}                   # Dict of chat_id → {title, messages, timestamp}
-
-if "current_chat_id" not in st.session_state:        # Track which chat is currently active
-    st.session_state["current_chat_id"] = None       # None means no active chat yet
-
-if not st.session_state["chats"] and st.session_state["current_chat_id"] is None:  # First ever load
-    _init_id = str(uuid.uuid4())                            # Generate ID for the initial chat
-    st.session_state["current_chat_id"] = _init_id          # Set as active
-    st.session_state["chats"][_init_id] = {                 # Register in history
-        "title":     "New chat",                            # Default title
-        "messages":  [],                                    # Empty messages
-        "timestamp": datetime.now()                         # Record creation time
-    }
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -987,9 +1072,53 @@ query = st.chat_input(                                      # Sticky input box p
 ) 
 
 if query and query.strip() and not st.session_state["processing"]:        # Fresh submission → arm processing flag and rerun
-    st.session_state["processing"] = True                   # This makes the disabled box render BEFORE the RAG work starts
-    st.session_state["pending_query"] = query.strip()
-    st.rerun(scope="app")
+    query = query.strip()
+    estimated_tokens = len(query) // QUERY_CHAR_PER_TOKEN                 # Cheap estimate, no tokenizer dependency needed
+
+    if estimated_tokens >= QUERY_TOKEN_BUDGET:                            # At/above the hard budget → block submission
+        st.session_state["sidebar_status"] = {                            # Show as a sidebar status instead of a toast
+            "level": "warning",
+            "message": (
+                f"⚠️ Your message is too long (~{estimated_tokens} tokens). "
+                f"Please shorten it to under ~{QUERY_TOKEN_BUDGET} tokens and try again."
+            ),
+        }
+        logger.warning(f"Rejected oversized query (~{estimated_tokens} est. tokens).")
+        st.rerun(scope="app")                                              # Refresh so the sidebar status becomes visible
+    else:
+
+        cid = st.session_state["current_chat_id"]
+
+        user_ts = format_timestamp(datetime.now())
+
+        user_message = {
+            "role": "user",
+            "content": query,
+            "timestamp": user_ts,
+        }
+
+        st.session_state["messages"].append(user_message)
+
+        if cid:
+            if st.session_state["chats"][cid]["title"] == "New chat":
+                st.session_state["chats"][cid]["title"] = (
+                    query[:40] + ("…" if len(query) > 40 else "")
+                )
+
+            st.session_state["chats"][cid]["messages"] = list(st.session_state["messages"])
+            st.session_state["chats"][cid]["chat_history"] = list(st.session_state["chat_history"])
+            st.session_state["chats"][cid]["timestamp"] = datetime.now()
+
+        st.session_state["processing"] = True                   # This makes the disabled box render BEFORE the RAG work starts
+        st.session_state["pending_query"] = query
+
+        if estimated_tokens >= QUERY_TOKEN_BUDGET * QUERY_TOKEN_WARN_RATIO:
+            st.toast(
+                f"⚠️ Your message is quite long (~{estimated_tokens} tokens) and close to thelimit. "
+                f"Consider trimming it if you see incomplete answers.",
+                icon="⚠️",
+            )
+        st.rerun(scope="app")
 
 # ── Handle new user query ─────────────────────────────────────────────────────
 
@@ -998,22 +1127,29 @@ if st.session_state["processing"] and st.session_state["pending_query"]:  # Only
 
     # ── Handle stop-generation request ──────────────────────────────────
     if st.session_state.get("stop_requested"):                            # User clicked stop mid-generation
-        partial = st.session_state.get("streaming_response", "")           # Recover whatever tokens made it through
-        final_text = partial if partial.strip() else "Generation stopped."
-        assistant_ts = format_timestamp(datetime.now())                    # Timestamp for the partial reply
 
-        st.session_state["messages"].append({                              # Save the partial reply as a normal message
+        assistant_ts = format_timestamp(datetime.now())                   # Timestamp for the partial reply
+
+        st.session_state["streaming_response"] = ""
+
+        if (
+            st.session_state["messages"]
+            and st.session_state["messages"][-1]["role"] == "assistant"
+            and st.session_state["messages"][-1].get("streaming", False)
+        ):
+            st.session_state["messages"].pop()
+
+        st.session_state["messages"].append({
             "role": "assistant",
-            "content": final_text,
+            "content": "Generation stopped.",
             "timestamp": assistant_ts,
             "sources": [],
             "stopped": True,
         })
 
-        logger.info("Generation stopped by user — partial response saved.")
+        logger.info("Generation stopped by user")
 
         st.session_state["stop_requested"]     = False                     # Reset all flags back to idle state
-        st.session_state["streaming_response"] = ""
         st.session_state["processing"]         = False
         st.session_state["pending_query"]      = None
         st.session_state["regenerating"]       = False
@@ -1034,21 +1170,20 @@ if st.session_state["processing"] and st.session_state["pending_query"]:  # Only
 
     if not is_regenerating:
         # ── Append + display user message (LEFT) ──
-        st.session_state["messages"].append(
-            {"role": "user", "content": query, "timestamp": user_ts}
-        )
         logger.info(f"User query: {query}")
 
-        st.markdown(
-            f'<div class="askly-row user">'
-            f'<div class="askly-content">'
-            f'<div class="askly-bubble user">{query}</div>'
-            f'<div class="askly-meta">🕐 {user_ts}</div>'
-            f'</div>'
-            f'<div class="askly-avatar user">🧑</div>'
-            f'</div>',
-            unsafe_allow_html=True,
-        )
+        cid = st.session_state.get("current_chat_id")
+        if cid:
+            # Auto-title using the first user query.
+            if st.session_state["chats"][cid]["title"] == "New chat":
+                st.session_state["chats"][cid]["title"] = (
+                    query[:40] + ("…" if len(query) > 40 else "")
+                )
+
+            # Persist the current state immediately.
+            st.session_state["chats"][cid]["messages"] = st.session_state["messages"]
+            st.session_state["chats"][cid]["timestamp"] = datetime.now()
+
     else:
         st.session_state["regenerating"] = False  # consume the flag
         logger.info(f"Regenerating answer for query: {query}")
@@ -1060,10 +1195,18 @@ if st.session_state["processing"] and st.session_state["pending_query"]:  # Only
     full_response        = ""                          # Accumulator for the complete streamed reply
     sources = []
     
-    render_bubble(
-        response_placeholder,
-        avatar_only=True
-    )
+    assistant_ts = format_timestamp(datetime.now())
+    assistant_index = len(st.session_state["messages"])
+
+    st.session_state["messages"].append({
+        "role": "assistant",
+        "content": "",
+        "timestamp": assistant_ts,
+        "sources": [],
+        "streaming": True,
+    })
+
+    render_bubble(response_placeholder, avatar_only=True)
 
     # ══════════════════════════════════════════════════════════════════
     # BRANCH A — Clarification turn
@@ -1071,6 +1214,8 @@ if st.session_state["processing"] and st.session_state["pending_query"]:  # Only
     # No retrieval is done — reply is determined by the user's typed answer.
     # ══════════════════════════════════════════════════════════════════
 
+    generation_stopped = False
+    
     if st.session_state["awaiting_clarification"]:
 
         logger.info(
@@ -1126,47 +1271,150 @@ if st.session_state["processing"] and st.session_state["pending_query"]:  # Only
 
     else:
 
-        # Retrieve
-        with st.spinner("🔍 Searching documents..."):      # Show spinner during retrieval (may take a few seconds)
+        try:
+            # Retrieve
+            with st.spinner("🔍 Searching documents..."):      # Show spinner during retrieval (may     take a few seconds)
 
-            search_query = rewrite_query_with_history(     # Resolve pronouns/follow-ups BEFORE retrieval runs
-            query,                                         # Original user question (raw)
-            st.session_state["chat_history"]               # Prior turns used to resolve references
+                search_query = rewrite_query_with_history(     # Resolve pronouns/follow-ups BEFORE     retrieval runs
+                query,                                         # Original user question (raw)
+                st.session_state["chat_history"]               # Prior turns used to resolve references
+                )
+
+                # Build retrievers once per session and reuse — chunks/vectorstore
+                # only change during startup indexing, not on every query.
+                if "bm25_retriever" not in st.session_state:
+                    st.session_state["bm25_retriever"] = get_bm25_retriever(st.session_state["chunks"])
+                if "dense_retriever" not in st.session_state:
+                    st.session_state["dense_retriever"] = get_dense_retriever(st.session_state  ["vectorstore"])
+
+                bm25_retriever  = st.session_state["bm25_retriever"]
+                dense_retriever = st.session_state["dense_retriever"]
+                docs_with_scores = retrieve(                   # Run full pipeline: BM25 + dense +  cross-encoder rerank
+                search_query,                                  # User's question
+                bm25_retriever,                                # BM25 keyword retriever
+                dense_retriever                                # Dense vector retriever
+                )
+
+                logger.info(                                   # Record retrieval results
+                    f"Retrieved {len(docs_with_scores)} reranked chunk(s)"
+                )
+
+            # stream the LLM answer
+            with st.spinner("💬 Generating response..."):
+
+                generation_stopped = False
+
+                for token in run_rag_chain_stream(
+                    search_query, 
+                    docs_with_scores,
+                    chat_history=st.session_state["chat_history"]   # pass memory
+                ):
+                    if st.session_state.get("stop_requested"):
+
+                        generation_stopped = True
+                        assistant_ts = format_timestamp(datetime.now())
+
+                        if assistant_index < len(st.session_state["messages"]):
+                            st.session_state["messages"][assistant_index].update({
+                                "content": "Generation stopped.",
+                                "timestamp": assistant_ts,
+                                "sources": [],
+                                "stopped": True,
+                            })
+                            st.session_state["messages"][assistant_index].pop("streaming", None)
+
+                        st.session_state["streaming_response"] = ""
+                        render_bubble(
+                            response_placeholder,
+                            "Generation stopped.",
+                            show_timestamp=True,
+                        )
+
+                        st.session_state["stop_requested"] = False
+                        st.session_state["processing"] = False
+                        st.session_state["pending_query"] = None
+                        st.session_state["regenerating"] = False
+
+                        st.rerun(scope="app")
+                        st.stop()                        
+
+                    full_response += token or ""
+                    st.session_state["streaming_response"] = full_response  # persist tokens so a mid-stream Stop can recover them
+                    st.session_state["messages"][assistant_index]["content"] = full_response
+                    render_bubble(response_placeholder, full_response)
+
+                st.session_state["messages"][assistant_index].update({
+                    "content": full_response,
+                    "sources": sources,
+                })
+
+                st.session_state["messages"][assistant_index].pop("streaming", None)
+
+                render_bubble(response_placeholder, full_response, show_timestamp=True)
+        
+        except Exception as e:
+            # Backend failure — e.g. Ollama stopped, connection lost,
+            # model unavailable, timeout, etc.
+            logger.error(f"Backend failure during retrieval/generation: {e}", exc_info=True)
+
+            error_message = (
+                "I wasn't able to generate a response because the backend service "
+                "is currently unavailable.\n\n"
+                "Please try again in a few moments. "
+                "If the problem persists, contact your administrator."
             )
 
-            # Build retrievers once per session and reuse — chunks/vectorstore
-            # only change during startup indexing, not on every query.
-            if "bm25_retriever" not in st.session_state:
-                st.session_state["bm25_retriever"] = get_bm25_retriever(st.session_state["chunks"])
-            if "dense_retriever" not in st.session_state:
-                st.session_state["dense_retriever"] = get_dense_retriever(st.session_state["vectorstore"])
+            error_ts = format_timestamp(datetime.now())
 
-            bm25_retriever  = st.session_state["bm25_retriever"]
-            dense_retriever = st.session_state["dense_retriever"]
-            docs_with_scores = retrieve(                   # Run full pipeline: BM25 + dense + cross-encoder rerank
-            search_query,                                  # User's question
-            bm25_retriever,                                # BM25 keyword retriever
-            dense_retriever                                # Dense vector retriever
-            )
+            # Replace the temporary streaming assistant message instead of
+            # appending a second assistant message.
+            if assistant_index < len(st.session_state["messages"]):
+                st.session_state["messages"][assistant_index].update({
+                    "content": error_message,
+                    "timestamp": error_ts,
+                    "sources": [],
+                    "stopped": True,
+                })
+                st.session_state["messages"][assistant_index].pop("streaming", None)
+            else:
+                # Safety fallback
+                st.session_state["messages"].append({
+                    "role": "assistant",
+                    "content": error_message,
+                    "timestamp": error_ts,
+                    "sources": [],
+                    "stopped": True,
+                })
 
-            logger.info(                                   # Record retrieval results
-                f"Retrieved {len(docs_with_scores)} reranked chunk(s)"
-            )
+            # Render the backend error immediately in the chat bubble
+            render_bubble(
+                response_placeholder,
+                error_message,
+                show_timestamp=True,
+            )                
 
-        # stream the LLM answer
-        with st.spinner("💬 Generating response..."):
-            for token in run_rag_chain_stream(
-                search_query, 
-                docs_with_scores,
-                chat_history=st.session_state["chat_history"]   # pass memory
-            ):
-                full_response += token or ""
-                st.session_state["streaming_response"] = full_response  # persist tokens so a mid-stream Stop can recover them
-                render_bubble(response_placeholder, full_response)
-                if st.session_state.get("stop_requested"):               # bail out immediately instead of finishing the full stream
-                    break
+            # Persist the updated conversation
+            _cid = st.session_state.get("current_chat_id")
+            if _cid and _cid in st.session_state["chats"]:
+                st.session_state["chats"][_cid]["messages"] = st.session_state["messages"]
+                st.session_state["chats"][_cid]["chat_history"] = st.session_state["chat_history"]
+                save_chats_to_disk(st.session_state["chats"])
 
-        render_bubble(response_placeholder, full_response, show_timestamp=True)
+            # Optional sidebar notification
+            st.session_state["sidebar_status"] = {
+                "level": "error",
+                "message": "❌ Backend connection lost.",
+            }
+
+            # Reset runtime state
+            st.session_state["processing"] = False
+            st.session_state["pending_query"] = None
+            st.session_state["streaming_response"] = ""
+            st.session_state["stop_requested"] = False
+            st.session_state["regenerating"] = False
+
+            # Refresh the UI so the assistant error message becomes the final turn.
+            st.rerun(scope="app")
 
         logger.info(
             f"Generated response ({len(full_response)} chars)"
@@ -1221,14 +1469,19 @@ if st.session_state["processing"] and st.session_state["pending_query"]:  # Only
 
     logger.info("=" * 80)
 
-    assistant_ts = format_timestamp(datetime.now())   
+    if not generation_stopped:
 
-    st.session_state["messages"].append({
-         "role": "assistant", 
-         "content": full_response, 
-         "timestamp": assistant_ts,
-         "sources": sources,
-    })
+        # Finalize the assistant message that was created before streaming.
+        if assistant_index < len(st.session_state["messages"]):
+
+            st.session_state["messages"][assistant_index].update({
+                "content": full_response,
+                "timestamp": assistant_ts,
+                "sources": sources,
+            })
+
+            # Remove the temporary streaming flag now that generation is complete.
+            st.session_state["messages"][assistant_index].pop("streaming", None)
 
     # ── Auto-title the chat using the first user message ──────────────────
     cid = st.session_state.get("current_chat_id")                                     # Get ctive chat ID
@@ -1239,6 +1492,7 @@ if st.session_state["processing"] and st.session_state["pending_query"]:  # Only
     if cid:                                                                                # Get ctive chat ID if set
         st.session_state["chats"][cid]["messages"]     = st.session_state["messages"]      # Persist messages
         st.session_state["chats"][cid]["chat_history"] = st.session_state["chat_history"]  # Persist LLM memory
+        save_chats_to_disk(st.session_state["chats"])
 
     # ── Unlock the input box now that the assistant's reply is fully rendered ──
     st.session_state["processing"]    = False
